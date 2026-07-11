@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "greengate"
+version = "0.1.0"
+description = "Confidence-aware cascading framework for green AI inference"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Tharusha Rasath Hemachandra"}]
+dependencies = [
+    "torch>=2.0",
+    "transformers>=4.40",
+]
+
+[project.optional-dependencies]
+gpu = ["pynvml>=11.5", "bitsandbytes>=0.43"]
+api = ["ecologits", "openai"]
+eval = ["pandas", "numpy", "matplotlib", "scikit-learn"]
+
+[tool.setuptools.packages.find]
+include = ["greengate*"]
