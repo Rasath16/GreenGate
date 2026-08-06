@@ -54,38 +54,51 @@ def main():
     queries = load_sharegpt(n_queries=args.n, seed=args.seed)
     print(f"  got {len(queries)} queries")
 
-    # Resume support: skip already-completed queries
+    # Resume support: skip already-completed queries.
+    # Small-pass results are checkpointed incrementally to small_path so a
+    # dead session never loses more than the current query.
+    small_path = outdir / "text_records_small.jsonl"
     done = {}
-    if out_path.exists():
-        for line in out_path.read_text(encoding="utf-8").splitlines():
-            rec = json.loads(line)
-            done[rec["idx"]] = rec
-        print(f"  resuming: {len(done)} records already complete")
+    for path in (out_path, small_path):
+        if path.exists():
+            for line in path.read_text(encoding="utf-8").splitlines():
+                rec = json.loads(line)
+                done.setdefault(rec["idx"], rec)
+    if done:
+        print(f"  resuming: {len(done)} small-pass records already complete")
 
     print(f"\n[1/2] Small model: {args.small}")
-    small = SmallTextModel(args.small, temperature_T=T,
-                           max_new_tokens=args.max_new_tokens,
-                           load_in_4bit=args.small_4bit)
+    need_small = [i for i in range(len(queries)) if i not in done]
+    small = None
+    if need_small:
+        small = SmallTextModel(args.small, temperature_T=T,
+                               max_new_tokens=args.max_new_tokens,
+                               load_in_4bit=args.small_4bit)
 
     records = []
-    for i, q in enumerate(queries):
-        if i in done:
-            records.append(done[i])
-            continue
-        r = small.generate(q)
-        records.append({
-            "idx": i, "query": q,
-            "small_response": r.response,
-            "small_entropy_raw": r.entropy_raw,
-            "small_entropy_cal": r.entropy_calibrated,
-            "small_energy_j": r.energy_joules,
-            "small_carbon_g": r.carbon_grams,
-            "small_latency_s": r.latency_s,
-            "small_tokens": r.output_tokens,
-        })
-        if (i + 1) % 25 == 0:
-            print(f"  {i + 1}/{len(queries)}")
-    del small
+    with open(small_path, "a", encoding="utf-8") as ckpt:
+        for i, q in enumerate(queries):
+            if i in done:
+                records.append(done[i])
+                continue
+            r = small.generate(q)
+            rec = {
+                "idx": i, "query": q,
+                "small_response": r.response,
+                "small_entropy_raw": r.entropy_raw,
+                "small_entropy_cal": r.entropy_calibrated,
+                "small_energy_j": r.energy_joules,
+                "small_carbon_g": r.carbon_grams,
+                "small_latency_s": r.latency_s,
+                "small_tokens": r.output_tokens,
+            }
+            records.append(rec)
+            ckpt.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            ckpt.flush()
+            if (i + 1) % 25 == 0:
+                print(f"  {i + 1}/{len(queries)}")
+    if small is not None:
+        del small
 
     print(f"\n[2/2] Large API tier: {args.large}"
           + (" [DRY RUN]" if args.dry_run_api else ""))
