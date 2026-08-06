@@ -26,6 +26,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=150, help="validation questions (held out from test)")
     ap.add_argument("--small", default="Qwen/Qwen2.5-0.5B-Instruct")
+    ap.add_argument("--small-4bit", action="store_true")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--outdir", default="results")
     args = ap.parse_args()
@@ -37,7 +38,7 @@ def main():
     questions = load_mmlu(n_questions=args.n, seed=args.seed, split="validation")
 
     print(f"Collecting choice logits from {args.small}...")
-    evaluator = ChoiceEvaluator(args.small)
+    evaluator = ChoiceEvaluator(args.small, load_in_4bit=args.small_4bit)
     logits_rows, labels = [], []
     for i, q in enumerate(questions):
         r = evaluator.evaluate(q)
