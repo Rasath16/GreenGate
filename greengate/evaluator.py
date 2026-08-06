@@ -27,6 +27,7 @@ class ChoiceResult:
     entropy: float  # bits, over the 4 choices (max = 2.0)
     energy_joules: float
     carbon_grams: float
+    choice_logits: list[float] | None = None  # raw A/B/C/D logits (for calibration)
 
 
 class ChoiceEvaluator:
@@ -97,4 +98,5 @@ class ChoiceEvaluator:
             entropy=entropy,
             energy_joules=energy,
             carbon_grams=carbon,
+            choice_logits=[float(x) for x in choice_logits.tolist()],
         )

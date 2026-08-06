@@ -28,15 +28,20 @@ class MMLUQuestion:
         return "\n".join(lines)
 
 
-def load_mmlu(n_questions: int = 300, seed: int = 42) -> list[MMLUQuestion]:
-    """Load a balanced random sample of MMLU test questions.
+def load_mmlu(n_questions: int = 300, seed: int = 42,
+              split: str = "test") -> list[MMLUQuestion]:
+    """Load a random sample of MMLU questions.
 
-    Uses the HuggingFace 'cais/mmlu' dataset ('all' config, test split).
+    split="test"       -> evaluation questions
+    split="validation" -> held-out calibration split (temperature scaling),
+                          never used for evaluation (no data leakage)
+
+    Uses the HuggingFace 'cais/mmlu' dataset ('all' config).
     Downloaded once, cached locally afterwards.
     """
     from datasets import load_dataset
 
-    ds = load_dataset("cais/mmlu", "all", split="test")
+    ds = load_dataset("cais/mmlu", "all", split=split)
     ds = ds.shuffle(seed=seed).select(range(min(n_questions, len(ds))))
 
     questions = []
