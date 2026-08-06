@@ -78,8 +78,8 @@ class CarbonProfiler:
             avg_power = self.cpu_tdp_watts * 0.4  # ~40% utilisation estimate
 
         energy_joules = avg_power * elapsed
-        energy_wh = energy_joules / 3600.0
-        carbon_grams = energy_wh * self.pue * self.carbon_intensity
+        energy_kwh = energy_joules / 3_600_000.0  # J -> kWh
+        carbon_grams = energy_kwh * self.pue * self.carbon_intensity
 
         return energy_joules, carbon_grams
 
