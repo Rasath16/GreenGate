@@ -1,3 +1,4 @@
+import threading
 import time
 from dataclasses import dataclass, field
 
@@ -41,10 +42,12 @@ class CarbonProfiler:
         carbon_intensity: float = DEFAULT_CARBON_INTENSITY,
         pue: float = DEFAULT_PUE,
         cpu_tdp_watts: float = 15.0,
+        poll_interval_s: float = 0.1,
     ):
         self.carbon_intensity = carbon_intensity
         self.pue = pue
         self.cpu_tdp_watts = cpu_tdp_watts
+        self.poll_interval_s = poll_interval_s
         self.records: list[QueryCarbonRecord] = []
         self._timer_start: float = 0.0
         self._gpu_available = False
@@ -52,18 +55,39 @@ class CarbonProfiler:
         self._try_init_gpu()
 
     def _try_init_gpu(self):
+        """Enumerate ALL GPUs — models sharded with device_map=auto draw
+        power on every device, so measuring index 0 alone undercounts."""
         try:
             import pynvml
             pynvml.nvmlInit()
-            self._gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-            self._gpu_available = True
+            n = pynvml.nvmlDeviceGetCount()
+            self._gpu_handles = [pynvml.nvmlDeviceGetHandleByIndex(i)
+                                 for i in range(n)]
+            self._gpu_available = n > 0
         except Exception:
             self._gpu_available = False
 
+    def _total_power_w(self) -> float:
+        """Instantaneous power draw summed across all GPUs (Watts)."""
+        import pynvml
+        return sum(pynvml.nvmlDeviceGetPowerUsage(h)
+                   for h in self._gpu_handles) / 1000.0
+
+    def _poll_loop(self):
+        while not self._poll_stop.is_set():
+            try:
+                self._samples.append(self._total_power_w())
+            except Exception:
+                pass
+            self._poll_stop.wait(self.poll_interval_s)
+
     def start(self):
         if self._gpu_available:
-            import pynvml
-            self._power_before = pynvml.nvmlDeviceGetPowerUsage(self._gpu_handle) / 1000.0
+            self._samples = [self._total_power_w()]
+            self._poll_stop = threading.Event()
+            self._poll_thread = threading.Thread(target=self._poll_loop,
+                                                 daemon=True)
+            self._poll_thread.start()
         self._timer_start = time.perf_counter()
 
     def stop(self) -> tuple[float, float]:
@@ -71,9 +95,13 @@ class CarbonProfiler:
         elapsed = time.perf_counter() - self._timer_start
 
         if self._gpu_available:
-            import pynvml
-            power_after = pynvml.nvmlDeviceGetPowerUsage(self._gpu_handle) / 1000.0
-            avg_power = (self._power_before + power_after) / 2.0
+            self._poll_stop.set()
+            self._poll_thread.join(timeout=1.0)
+            try:
+                self._samples.append(self._total_power_w())
+            except Exception:
+                pass
+            avg_power = sum(self._samples) / len(self._samples)
         else:
             avg_power = self.cpu_tdp_watts * 0.4  # ~40% utilisation estimate
 
