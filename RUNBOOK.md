@@ -60,6 +60,24 @@ Thesis Table: fitted T + ECE before/after per model.
 ```
 Objective VQA accuracy — no judging cost.
 
+## 5b. Model zoo sweep (generalization table + library presets, ~2.5h, $0)
+
+Optional but recommended — MMLU + calibration for several small models
+against the same large tier. Feeds the thesis generalization table and
+the library's preset registry (greengate/presets.json).
+
+```python
+ZOO = ["Qwen/Qwen2.5-0.5B-Instruct", "Qwen/Qwen2.5-1.5B-Instruct",
+       "Qwen/Qwen2.5-3B-Instruct", "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+       "microsoft/Phi-3.5-mini-instruct", "TinyLlama/TinyLlama-1.1B-Chat-v1.0"]
+for m in ZOO:
+    slug = m.split("/")[-1]
+    !python calibrate_mmlu.py --n 150 --small {m} --outfile results/cal_{slug}.json
+    !python eval_mmlu.py --n 300 --small {m} --large mistralai/Mistral-7B-Instruct-v0.2 --large-4bit --outdir results/zoo_{slug}
+```
+
+After the run, copy each fitted temperature into greengate/presets.json.
+
 ## 6. Semantic entropy ablation (~1h)
 
 ```

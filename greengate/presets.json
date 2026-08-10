@@ -1,0 +1,10 @@
+{
+  "_comment": "Pre-fitted temperature scaling values from the thesis evaluation (calibrate_mmlu.py on held-out MMLU validation). Models not listed here self-calibrate via GreenGate.calibrate(). Updated after each evaluation run.",
+  "mistralai/Mistral-7B-Instruct-v0.2": {
+    "temperature": 6.621,
+    "ece_before": 0.3086,
+    "ece_after": 0.0619,
+    "quantization": "4bit",
+    "fitted_on": "MMLU validation n=150, 2026-08-06"
+  }
+}
