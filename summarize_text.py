@@ -36,6 +36,14 @@ def local_carbon(rec: dict, intensity: float) -> float:
     return rec["small_energy_j"] / 3_600_000.0 * PUE * intensity  # J -> kWh -> g
 
 
+def large_carbon(rec: dict, intensity: float) -> float:
+    """Large-tier carbon: grid-rescalable when local (measured Joules),
+    fixed EcoLogits estimate when API (provider grid, not user grid)."""
+    if "large_energy_j" in rec:
+        return rec["large_energy_j"] / 3_600_000.0 * PUE * intensity
+    return rec["large_carbon_g"]
+
+
 def simulate(records, scores, flags, runs_small_first, intensity=475.0):
     n = len(records)
     qual, carbon, latency = 0.0, 0.0, 0.0
@@ -45,7 +53,7 @@ def simulate(records, scores, flags, runs_small_first, intensity=475.0):
         c_small = local_carbon(rec, intensity)
         if esc:
             qual += s_large
-            carbon += rec["large_carbon_g"]
+            carbon += large_carbon(rec, intensity)
             latency += rec["large_latency_s"]
             if runs_small_first:
                 carbon += c_small                      # full accounting
@@ -67,7 +75,8 @@ def main():
     ap.add_argument("--records", default="results/text_records.jsonl")
     ap.add_argument("--judgments", default="results/judgments.jsonl")
     ap.add_argument("--signal", default="small_entropy_cal",
-                    choices=["small_entropy_cal", "small_entropy_raw"])
+                    help="any numeric field in the records, e.g. small_entropy_raw, "
+                         "small_entropy_first, small_entropy_max, semantic_entropy")
     ap.add_argument("--threshold", type=float, default=None,
                     help="report threshold (default: best gQoS above floor)")
     ap.add_argument("--floor", type=float, default=0.80,
@@ -85,7 +94,8 @@ def main():
 
     # Keep only records with both judgments
     records = [r for r in records
-               if (r["idx"], "small") in scores and (r["idx"], "large") in scores]
+               if (r["idx"], "small") in scores and (r["idx"], "large") in scores
+               and args.signal in r]
     n = len(records)
     if n == 0:
         raise SystemExit("No fully-judged records — run judge_openai.py first.")

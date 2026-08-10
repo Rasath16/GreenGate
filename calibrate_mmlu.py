@@ -29,6 +29,8 @@ def main():
     ap.add_argument("--small-4bit", action="store_true")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--outdir", default="results")
+    ap.add_argument("--outfile", default=None,
+                    help="output path (default <outdir>/calibration.json)")
     args = ap.parse_args()
 
     outdir = Path(args.outdir)
@@ -72,9 +74,10 @@ def main():
         "ece_before": round(ece_before, 5),
         "ece_after": round(ece_after, 5),
     }
-    with open(outdir / "calibration.json", "w") as f:
+    outfile = Path(args.outfile) if args.outfile else outdir / "calibration.json"
+    with open(outfile, "w") as f:
         json.dump(out, f, indent=2)
-    print(f"Saved {outdir}/calibration.json")
+    print(f"Saved {outfile}")
 
 
 if __name__ == "__main__":

@@ -14,6 +14,8 @@ class GenResult:
     response: str
     entropy_raw: float        # mean token entropy, T=1 (bits)
     entropy_calibrated: float # mean token entropy at fitted T (bits)
+    entropy_first: float      # first-token entropy, T=1 (bits)
+    entropy_max: float        # max per-token entropy, T=1 (bits)
     energy_joules: float
     carbon_grams: float
     latency_s: float
@@ -81,20 +83,25 @@ class SmallTextModel:
         energy, carbon = self.profiler.stop()
         latency = time.perf_counter() - t0
 
-        def mean_entropy(temp: float) -> float:
+        def step_entropies(temp: float) -> list[float]:
             ents = []
             for step_logits in out.scores:
                 probs = F.softmax(step_logits[0] / temp, dim=-1).clamp(min=1e-9)
                 ents.append(-(probs * probs.log2()).sum().item())
-            return sum(ents) / len(ents) if ents else 0.0
+            return ents
+
+        ents_raw = step_entropies(1.0)
+        ents_cal = step_entropies(self.T)
 
         gen_ids = out.sequences[0][inputs["input_ids"].shape[1]:]
         response = self.tokenizer.decode(gen_ids, skip_special_tokens=True)
 
         return GenResult(
             response=response.strip(),
-            entropy_raw=mean_entropy(1.0),
-            entropy_calibrated=mean_entropy(self.T),
+            entropy_raw=sum(ents_raw) / len(ents_raw) if ents_raw else 0.0,
+            entropy_calibrated=sum(ents_cal) / len(ents_cal) if ents_cal else 0.0,
+            entropy_first=ents_raw[0] if ents_raw else 0.0,
+            entropy_max=max(ents_raw) if ents_raw else 0.0,
             energy_joules=energy,
             carbon_grams=carbon,
             latency_s=latency,
