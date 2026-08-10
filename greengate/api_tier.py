@@ -29,14 +29,18 @@ class APIResult:
     energy_wh: float
     carbon_grams: float
     carbon_source: str  # "ecologits" or "fallback_estimate"
+    # confidence signals from top-20 logprobs (None unless logprobs=True):
+    avg_logprob: float | None = None      # mean log P(chosen token)
+    trunc_entropy: float | None = None    # mean entropy over renormalised top-20 (bits)
 
 
 class APILargeTier:
     def __init__(self, model: str = "gpt-4o-mini", max_tokens: int = 300,
-                 dry_run: bool = False):
+                 dry_run: bool = False, logprobs: bool = False):
         self.model = model
         self.max_tokens = max_tokens
         self.dry_run = dry_run
+        self.logprobs = logprobs
         self._ecologits_ok = False
 
         if dry_run:
@@ -84,13 +88,32 @@ class APILargeTier:
         return self._chat(prompt)
 
     def _chat(self, content) -> APIResult:
+        kwargs = {}
+        if self.logprobs:
+            kwargs = {"logprobs": True, "top_logprobs": 20}
         t0 = time.perf_counter()
         resp = self.client.chat.completions.create(
             model=self.model,
             messages=[{"role": "user", "content": content}],
             max_tokens=self.max_tokens,
+            **kwargs,
         )
         latency = time.perf_counter() - t0
+
+        avg_lp = trunc_H = None
+        lp_content = getattr(resp.choices[0].logprobs, "content", None) \
+            if self.logprobs and resp.choices[0].logprobs else None
+        if lp_content:
+            import math
+            lps, ents = [], []
+            for tok in lp_content:
+                lps.append(tok.logprob)
+                if tok.top_logprobs:
+                    ps = [math.exp(t.logprob) for t in tok.top_logprobs]
+                    z = sum(ps) or 1.0
+                    ents.append(-sum(p / z * math.log2(p / z) for p in ps if p > 0))
+            avg_lp = sum(lps) / len(lps) if lps else None
+            trunc_H = sum(ents) / len(ents) if ents else None
 
         text = resp.choices[0].message.content or ""
         in_tok = resp.usage.prompt_tokens
@@ -118,4 +141,5 @@ class APILargeTier:
             input_tokens=in_tok, output_tokens=out_tok,
             latency_s=latency, energy_wh=energy_wh,
             carbon_grams=carbon_g, carbon_source=source,
+            avg_logprob=avg_lp, trunc_entropy=trunc_H,
         )
