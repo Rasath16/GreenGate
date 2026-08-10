@@ -87,6 +87,8 @@ def main():
                 "small_response": r.response,
                 "small_entropy_raw": r.entropy_raw,
                 "small_entropy_cal": r.entropy_calibrated,
+                "small_entropy_first": r.entropy_first,
+                "small_entropy_max": r.entropy_max,
                 "small_energy_j": r.energy_joules,
                 "small_carbon_g": r.carbon_grams,
                 "small_latency_s": r.latency_s,

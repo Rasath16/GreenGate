@@ -25,6 +25,7 @@ Usage (Kaggle/Colab T4):
 
 import argparse
 import csv
+import json
 import random
 import sys
 from pathlib import Path
@@ -99,6 +100,9 @@ def main():
             "small_entropy": r.entropy,
             "small_energy": r.energy_joules,
             "small_carbon": r.carbon_grams,
+            # raw choice logits -> calibrated entropy can be re-simulated
+            # offline for Ablation B without re-running the model
+            "small_logits": json.dumps(r.choice_logits),
         })
         if (i + 1) % 25 == 0:
             print(f"  {i + 1}/{len(questions)}")

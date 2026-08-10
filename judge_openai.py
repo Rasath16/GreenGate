@@ -65,7 +65,10 @@ def main():
     ap.add_argument("--out", default="results/judgments.jsonl")
     ap.add_argument("--judge-model", default="gpt-4o")
     ap.add_argument("--limit", type=int, default=0, help="0 = all")
+    ap.add_argument("--tiers", default="small,large",
+                    help="which tiers to judge, e.g. --tiers large")
     args = ap.parse_args()
+    wanted_tiers = set(args.tiers.split(","))
 
     from openai import OpenAI
     client = OpenAI()
@@ -84,6 +87,8 @@ def main():
     todo = []
     for rec in records:
         for tier, key in [("small", "small_response"), ("large", "large_response")]:
+            if tier not in wanted_tiers:
+                continue
             if (rec["idx"], tier) not in judged and rec.get(key):
                 if rec[key].startswith("[DRY RUN"):
                     continue
