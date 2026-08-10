@@ -5,6 +5,13 @@
     "ece_before": 0.3086,
     "ece_after": 0.0619,
     "quantization": "4bit",
-    "fitted_on": "MMLU validation n=150, 2026-08-06"
+    "fitted_on": "MMLU validation n=150, 2026-08-06 (reproduced 2026-08-10)"
+  },
+  "Qwen/Qwen2.5-0.5B-Instruct": {
+    "temperature": 2.678,
+    "ece_before": 0.2263,
+    "ece_after": 0.1186,
+    "quantization": "none (fp16)",
+    "fitted_on": "MMLU validation n=150, 2026-08-10"
   }
 }
