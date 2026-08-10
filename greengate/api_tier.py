@@ -53,6 +53,22 @@ class APILargeTier:
         from openai import OpenAI
         self.client = OpenAI()  # reads OPENAI_API_KEY env var
 
+    def query_vision(self, prompt: str, image) -> APIResult:
+        """Vision escalation: PIL image sent as a base64 data URL."""
+        if self.dry_run:
+            return self.query(prompt)
+        import base64
+        import io
+        buf = io.BytesIO()
+        image.save(buf, format="JPEG", quality=85)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        content = [
+            {"type": "text", "text": prompt},
+            {"type": "image_url",
+             "image_url": {"url": f"data:image/jpeg;base64,{b64}"}},
+        ]
+        return self._chat(content)
+
     def query(self, prompt: str) -> APIResult:
         if self.dry_run:
             return APIResult(
@@ -65,10 +81,13 @@ class APILargeTier:
                 carbon_source="dry_run",
             )
 
+        return self._chat(prompt)
+
+    def _chat(self, content) -> APIResult:
         t0 = time.perf_counter()
         resp = self.client.chat.completions.create(
             model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": content}],
             max_tokens=self.max_tokens,
         )
         latency = time.perf_counter() - t0
