@@ -29,17 +29,24 @@ from greengate.semantic import NLIClusterer, semantic_entropy
 
 
 def auroc(labels: list[int], scores: list[float]) -> float:
-    """AUROC via rank statistic (no sklearn dependency)."""
-    pairs = sorted(zip(scores, labels))
-    pos = sum(labels)
-    neg = len(labels) - pos
-    if pos == 0 or neg == 0:
+    """Tie-corrected AUROC (Mann-Whitney U): ties count half.
+
+    NOTE: an earlier version broke ties by label order, inflating AUROC
+    for heavily-quantised signals (semantic entropy at k=3 takes only
+    ~3 distinct values). Corrected 2026-08-11.
+    """
+    pos = [s for s, y in zip(scores, labels) if y == 1]
+    neg = [s for s, y in zip(scores, labels) if y == 0]
+    if not pos or not neg:
         return float("nan")
-    rank_sum = 0.0
-    for rank, (_, y) in enumerate(pairs, start=1):
-        if y == 1:
-            rank_sum += rank
-    return (rank_sum - pos * (pos + 1) / 2) / (pos * neg)
+    wins = ties = 0
+    for p in pos:
+        for n in neg:
+            if p > n:
+                wins += 1
+            elif p == n:
+                ties += 1
+    return (wins + 0.5 * ties) / (len(pos) * len(neg))
 
 
 def main():
