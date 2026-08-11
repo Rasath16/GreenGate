@@ -87,17 +87,25 @@ class APILargeTier:
 
         return self._chat(prompt)
 
-    def _chat(self, content) -> APIResult:
+    def _chat(self, content, retries: int = 6) -> APIResult:
         kwargs = {}
         if self.logprobs:
             kwargs = {"logprobs": True, "top_logprobs": 20}
+        from openai import RateLimitError, APIError
         t0 = time.perf_counter()
-        resp = self.client.chat.completions.create(
-            model=self.model,
-            messages=[{"role": "user", "content": content}],
-            max_tokens=self.max_tokens,
-            **kwargs,
-        )
+        for attempt in range(retries):
+            try:
+                resp = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": content}],
+                    max_tokens=self.max_tokens,
+                    **kwargs,
+                )
+                break
+            except (RateLimitError, APIError):
+                if attempt == retries - 1:
+                    raise
+                time.sleep(min(2 ** attempt, 30))  # 1,2,4,8,16,30s backoff
         latency = time.perf_counter() - t0
 
         avg_lp = trunc_H = None
