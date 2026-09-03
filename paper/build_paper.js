@@ -48,16 +48,43 @@ function tbl(caption, headers, rows, widths) {
   ];
 }
 
+// Two-author IEEE header as a borderless table (robust alignment)
+function authorBlock() {
+  const NONE = { style: "none", size: 0, color: "FFFFFF" };
+  const borders = { top: NONE, bottom: NONE, left: NONE, right: NONE,
+                    insideHorizontal: NONE, insideVertical: NONE };
+  const lines = (name, mail) => [
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
+      children: [new TextRun({ text: name, font: F, size: 22 })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
+      children: [new TextRun({ text: "Faculty of Computing", font: F, size: 20, italics: true })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
+      children: [new TextRun({ text: "NSBM Green University", font: F, size: 20, italics: true })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
+      children: [new TextRun({ text: "Homagama, Sri Lanka", font: F, size: 20, italics: true })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 },
+      children: [new TextRun({ text: mail, font: F, size: 20 })] }),
+  ];
+  const cell = (name, mail) => new TableCell({
+    width: { size: 4800, type: WidthType.DXA }, borders,
+    margins: { top: 0, bottom: 0, left: 100, right: 100 },
+    children: lines(name, mail),
+  });
+  return new Table({
+    width: { size: 9600, type: WidthType.DXA }, columnWidths: [4800, 4800], borders,
+    rows: [new TableRow({ children: [
+      cell("Tharusha Rasath Hemachandra", "ptrhemachandra@students.nsbm.ac.lk"),
+      cell("Thilini Bakmeedeniya", "thilini.b@nsbm.ac.lk"),
+    ] })],
+  });
+}
+
 // ---------- Title block (single column) ----------
 const head = [
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 },
     children: [new TextRun({ text: "What Counts as Saved? Measured-Energy Accounting for Confidence-Aware LLM Cascades", font: F, size: 48 })] }),
-  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
-    children: [new TextRun({ text: "Tharusha Rasath Hemachandra", font: F, size: 22 })] }),
-  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
-    children: [new TextRun({ text: "Faculty of Computing, NSBM Green University, Homagama, Sri Lanka", font: F, size: 20, italics: true })] }),
-  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 },
-    children: [new TextRun({ text: "tharusharasathml@gmail.com", font: F, size: 20 })] }),
+  authorBlock(),
+  new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: " ", size: 10 })] }),
 ];
 
 // ---------- Two-column body ----------
