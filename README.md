@@ -1,5 +1,9 @@
 # GreenGate
 
+[![PyPI version](https://img.shields.io/pypi/v/greengate.svg)](https://pypi.org/project/greengate/)
+[![Python](https://img.shields.io/pypi/pyversions/greengate.svg)](https://pypi.org/project/greengate/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **Cut the cost and carbon of LLM inference with one line of routing.** Easy queries are answered by a small local model; only genuinely hard ones escalate to a large model. Every query is carbon-accounted, honestly.
 
 ```bash
