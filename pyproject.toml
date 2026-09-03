@@ -5,10 +5,26 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "greengate"
 version = "0.1.0"
-description = "Confidence-aware cascading framework for green AI inference"
+description = "Confidence-aware cascading for green AI inference: route easy queries to a small local model, escalate only when uncertain, and account for the carbon honestly"
+readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "Tharusha Rasath Hemachandra"}]
+keywords = [
+    "green-ai", "llm", "carbon", "sustainability", "inference",
+    "model-cascade", "routing", "energy-efficiency", "uncertainty",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "torch>=2.0",
     "transformers>=4.40",
@@ -17,7 +33,16 @@ dependencies = [
 [project.optional-dependencies]
 gpu = ["pynvml>=11.5", "bitsandbytes>=0.43"]
 api = ["ecologits", "openai"]
-eval = ["pandas", "numpy", "matplotlib", "scikit-learn"]
+vision = ["torchvision", "pillow"]
+eval = ["pandas", "numpy", "matplotlib", "datasets"]
+
+[project.urls]
+Homepage = "https://github.com/Rasath16/GreenGate"
+Repository = "https://github.com/Rasath16/GreenGate"
+Issues = "https://github.com/Rasath16/GreenGate/issues"
 
 [tool.setuptools.packages.find]
 include = ["greengate*"]
+
+[tool.setuptools.package-data]
+greengate = ["presets.json"]
