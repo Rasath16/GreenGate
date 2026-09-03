@@ -17,11 +17,11 @@ const body = (t, opts = {}) => new Paragraph({
 });
 const sec = (n, t) => new Paragraph({
   alignment: AlignmentType.CENTER, spacing: { before: 200, after: 100 },
-  children: [new TextRun({ text: `${n}. ${t}`, font: F, size: 20, allCaps: true })],
+  children: [new TextRun({ text: `${n}. ${t}`, font: F, size: 20, bold: true })],
 });
 const sub = (t) => new Paragraph({
   spacing: { before: 120, after: 60 },
-  children: [new TextRun({ text: t, font: F, size: 20, italics: true })],
+  children: [new TextRun({ text: t, font: F, size: 20, bold: true, italics: true })],
 });
 const fig = (path, w, h, caption) => [
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 120, after: 40 },
@@ -48,56 +48,28 @@ function tbl(caption, headers, rows, widths) {
   ];
 }
 
-// Two-author IEEE header as a borderless table (robust alignment)
-function authorBlock() {
-  const NONE = { style: "none", size: 0, color: "FFFFFF" };
-  const borders = { top: NONE, bottom: NONE, left: NONE, right: NONE,
-                    insideHorizontal: NONE, insideVertical: NONE };
-  const lines = (name, mail) => [
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
-      children: [new TextRun({ text: name, font: F, size: 22 })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
-      children: [new TextRun({ text: "Faculty of Computing", font: F, size: 20, italics: true })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
-      children: [new TextRun({ text: "NSBM Green University", font: F, size: 20, italics: true })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 },
-      children: [new TextRun({ text: "Homagama, Sri Lanka", font: F, size: 20, italics: true })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 },
-      children: [new TextRun({ text: mail, font: F, size: 20 })] }),
-  ];
-  const cell = (name, mail) => new TableCell({
-    width: { size: 4800, type: WidthType.DXA }, borders,
-    margins: { top: 0, bottom: 0, left: 100, right: 100 },
-    children: lines(name, mail),
-  });
-  return new Table({
-    width: { size: 9600, type: WidthType.DXA }, columnWidths: [4800, 4800], borders,
-    rows: [new TableRow({ children: [
-      cell("Tharusha Rasath Hemachandra", "ptrhemachandra@students.nsbm.ac.lk"),
-      cell("Thilini Bakmeedeniya", "thilini.b@nsbm.ac.lk"),
-    ] })],
-  });
-}
-
-// ---------- Title block (single column) ----------
+// ---------- Title block (single column, IEEE style) ----------
 const head = [
-  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 },
-    children: [new TextRun({ text: "What Counts as Saved? Measured-Energy Accounting for Confidence-Aware LLM Cascades", font: F, size: 48 })] }),
-  authorBlock(),
-  new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: " ", size: 10 })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 },
+    children: [new TextRun({ text: "What Counts as Saved? Measured-Energy Accounting for Confidence-Aware LLM Cascades", font: F, size: 34, bold: true })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 },
+    children: [new TextRun({ text: "Tharusha Rasath Hemachandra, Thilini Bakmeedeniya", font: F, size: 22 })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 },
+    children: [new TextRun({ text: "Faculty of Computing, NSBM Green University, Homagama, Sri Lanka", font: F, size: 20, italics: true })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 },
+    children: [new TextRun({ text: "ptrhemachandra@students.nsbm.ac.lk, thilini.b@nsbm.ac.lk", font: F, size: 18 })] }),
 ];
 
 // ---------- Two-column body ----------
 const col = [];
 
-col.push(new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { after: 100 },
-  children: [
-    new TextRun({ text: "Abstract—", font: F, size: 18, bold: true, italics: true }),
-    new TextRun({ text: "Model cascading reduces the cost of large language model inference by answering easy queries with a small model and escalating only uncertain ones. When a query escalates, the small model has already run and its energy is spent, yet an escalated query can be charged either for both tiers or only for the tier that produced the returned answer. This paper measures what that choice is worth. We implement GreenGate, an open-source cascading middleware that meters GPU power at 100 ms intervals across all devices, uses temperature-scaled uncertainty as a training-free routing signal, and charges escalated queries for both tiers. Across 2,800 evaluated queries spanning open-ended user traffic, a structured benchmark and a visual question-answering workload, the two conventions diverge by 2.6 percentage points at 5 percent escalation and by 31.4 points at 60 percent, where charging only the answering tier reports a 23.3 percent reduction while full accounting shows an 8.0 percent increase over never cascading. Full accounting yields a break-even condition in which savings approximate the complement of the inter-tier energy ratio minus the escalation rate, which our measurements obey. Under this stricter accounting the cascade still reduces measured energy by 37.3 percent (95 percent CI 33.5 to 40.9) while retaining 95.9 percent of large-tier answer quality. A five-model study shows that routing-signal informativeness scales with small-model capability and identifies a capability floor below which cascading is strictly harmful, a regime that charging only the answering tier cannot express.", font: F, size: 18, italics: true }),
-  ] }));
+col.push(new Paragraph({ spacing: { after: 60 },
+  children: [new TextRun({ text: "Abstract", font: F, size: 18, bold: true, italics: true })] }));
+col.push(new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { after: 120 },
+  children: [new TextRun({ text: "Model cascading reduces the cost of large language model inference by answering easy queries with a small model and escalating only uncertain ones. When a query escalates, the small model has already run and its energy is spent, yet an escalated query can be charged either for both tiers or only for the tier that produced the returned answer. This paper measures what that choice is worth. We implement GreenGate, an open-source cascading middleware that meters GPU power at 100 ms intervals across all devices, uses temperature-scaled uncertainty as a training-free routing signal, and charges escalated queries for both tiers. Across 2,800 evaluated queries spanning open-ended user traffic, a structured benchmark and a visual question-answering workload, the two conventions diverge by 2.6 percentage points at 5 percent escalation and by 31.4 points at 60 percent, where charging only the answering tier reports a 23.3 percent reduction while full accounting shows an 8.0 percent increase over never cascading. Full accounting yields a break-even condition in which savings approximate the complement of the inter-tier energy ratio minus the escalation rate, which our measurements obey. Under this stricter accounting the cascade still reduces measured energy by 37.3 percent (95 percent CI 33.5 to 40.9) while retaining 95.9 percent of large-tier answer quality. A five-model study shows that routing-signal informativeness scales with small-model capability and identifies a capability floor below which cascading is strictly harmful, a regime that charging only the answering tier cannot express.", font: F, size: 18, bold: true, italics: true })] }));
 col.push(new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { after: 160 },
   children: [
-    new TextRun({ text: "Keywords—", font: F, size: 18, bold: true, italics: true }),
+    new TextRun({ text: "Index Terms—", font: F, size: 18, bold: true, italics: true }),
     new TextRun({ text: "green AI, model cascading, carbon accounting, energy measurement, uncertainty estimation", font: F, size: 18, italics: true }),
   ] }));
 
@@ -246,11 +218,11 @@ const doc = new Document({
   styles: { default: { document: { run: { font: F, size: 20 } } } },
   sections: [
     { properties: { page: { size: { width: 11906, height: 16838 },
-        margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } }, children: head },
+        margin: { top: 1080, bottom: 1440, left: 900, right: 900 } } }, children: head },
     { properties: { type: SectionType.CONTINUOUS,
-        column: { count: 2, space: 340, equalWidth: true },
+        column: { count: 2, space: 288, equalWidth: true },
         page: { size: { width: 11906, height: 16838 },
-          margin: { top: 1000, bottom: 1000, left: 1000, right: 1000 } } }, children: col },
+          margin: { top: 1080, bottom: 1440, left: 900, right: 900 } } }, children: col },
   ],
 });
 Packer.toBuffer(doc).then(b => {
