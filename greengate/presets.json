@@ -13,5 +13,41 @@
     "ece_after": 0.1186,
     "quantization": "none (fp16)",
     "fitted_on": "MMLU validation n=150, 2026-08-10"
+  },
+  "Qwen/Qwen2.5-1.5B-Instruct": {
+    "temperature": 2.2118,
+    "ece_before": 0.13998,
+    "ece_after": 0.09397,
+    "quantization": "none (fp16)",
+    "fitted_on": "MMLU validation n=150, 2026-09-03"
+  },
+  "Qwen/Qwen2.5-3B-Instruct": {
+    "temperature": 3.4549,
+    "ece_before": 0.21469,
+    "ece_after": 0.07049,
+    "quantization": "none (fp16)",
+    "fitted_on": "MMLU validation n=150, 2026-09-03"
+  },
+  "microsoft/Phi-3.5-mini-instruct": {
+    "temperature": 2.3477,
+    "ece_before": 0.19419,
+    "ece_after": 0.10412,
+    "quantization": "none (fp16)",
+    "fitted_on": "MMLU validation n=150, 2026-09-03"
+  },
+  "HuggingFaceTB/SmolLM2-1.7B-Instruct": {
+    "temperature": 1.9593,
+    "ece_before": 0.19356,
+    "ece_after": 0.09776,
+    "quantization": "none (fp16)",
+    "fitted_on": "MMLU validation n=150, 2026-09-03"
+  },
+  "TinyLlama/TinyLlama-1.1B-Chat-v1.0": {
+    "temperature": 8.0,
+    "ece_before": 0.14032,
+    "ece_after": 0.03941,
+    "quantization": "none (fp16)",
+    "fitted_on": "MMLU validation n=150, 2026-09-03",
+    "warning": "MMLU accuracy 0.243 is below 4-choice chance and the routing signal is uninformative (entropy gap 0.017 bits); cascading with this model increased carbon in evaluation. Not recommended as a small tier."
   }
 }

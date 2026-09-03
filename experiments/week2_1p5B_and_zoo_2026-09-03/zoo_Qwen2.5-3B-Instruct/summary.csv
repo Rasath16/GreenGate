@@ -1,0 +1,6 @@
+policy,accuracy,accuracy_retention_pct,carbon_g,carbon_reduction_pct,escalation_rate,gqos
+B1_static_large,0.5333,100.00,0.713886,0.00,1.000,0.7471
+B2_static_small,0.6533,122.50,0.295515,58.60,0.000,2.2108
+B3_random_50,0.6000,112.50,0.506823,29.01,0.503,1.1838
+B4_blind_cascade,0.6200,116.25,0.440682,38.27,0.203,1.4069
+GreenGate_t1.0,0.6467,121.25,0.463134,35.12,0.220,1.3963

@@ -1,0 +1,7 @@
+{
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "n_validation": 150,
+  "temperature": 6.6209,
+  "ece_before": 0.30864,
+  "ece_after": 0.06194
+}

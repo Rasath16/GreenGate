@@ -1,0 +1,7 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "n_validation": 150,
+  "temperature": 3.4549,
+  "ece_before": 0.21469,
+  "ece_after": 0.07049
+}

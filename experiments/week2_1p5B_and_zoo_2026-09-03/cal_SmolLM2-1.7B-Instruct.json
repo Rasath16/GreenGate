@@ -1,0 +1,7 @@
+{
+  "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+  "n_validation": 150,
+  "temperature": 1.9593,
+  "ece_before": 0.19356,
+  "ece_after": 0.09776
+}

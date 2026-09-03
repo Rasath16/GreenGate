@@ -1,0 +1,7 @@
+{
+  "model": "microsoft/Phi-3.5-mini-instruct",
+  "n_validation": 150,
+  "temperature": 2.3477,
+  "ece_before": 0.19419,
+  "ece_after": 0.10412
+}

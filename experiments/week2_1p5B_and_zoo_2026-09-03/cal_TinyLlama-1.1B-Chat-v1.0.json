@@ -1,0 +1,7 @@
+{
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "n_validation": 150,
+  "temperature": 8.0,
+  "ece_before": 0.14032,
+  "ece_after": 0.03941
+}
