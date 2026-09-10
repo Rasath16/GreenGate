@@ -1,0 +1,5 @@
+name, memory.total [MiB], power.max_limit [W], driver_version
+NVIDIA A100-SXM4-80GB, 81920 MiB, 400.00 W, 570.133.20
+Python 3.10.12
+torch 2.8.0+cu128 transformers 5.17.0
+bb62dc498caf9dd43dbf40d1c0bed9a7ef897ce9

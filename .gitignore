@@ -21,3 +21,10 @@ thesis/
 dist/
 build/
 *.egg-info/
+
+# Node modules (thesis build tooling)
+node_modules/
+
+# Published experiment evidence is deliberately tracked (see experiments/*/README.md)
+!experiments/**/*.csv
+!experiments/**/*.log

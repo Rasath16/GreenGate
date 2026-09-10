@@ -1,0 +1,40 @@
+### Qwen2.5-0.5B
+  B1_static_large         0.530  100.0%     0.6307     0.0%   100%    0.840
+  B2_static_small         0.463   87.4%     0.0859    86.4%     0%    5.395
+  B3_random_50            0.477   89.9%     0.3529    44.0%    50%    1.351
+  B4_blind_cascade        0.527   99.4%     0.5906     6.4%    80%    0.892
+  GreenGate_t1.0          0.530  100.0%     0.6045     4.2%    82%    0.877
+==============================================================================
+
+Wrote a100_Qwen2.5-0.5B/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
+### Qwen2.5-1.5B-Instruct
+  B1_static_large         0.530  100.0%     0.6330     0.0%   100%    0.837
+  B2_static_small         0.567  106.9%     0.1472    76.7%     0%    3.848
+  B3_random_50            0.520   98.1%     0.3860    39.0%    50%    1.347
+  B4_blind_cascade        0.567  106.9%     0.4122    34.9%    42%    1.375
+  GreenGate_t1.0          0.590  111.3%     0.4362    31.1%    45%    1.352
+==============================================================================
+
+Wrote a100_Qwen2.5-1.5B-Instruct/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
+### Qwen2.5-3B-Instruct
+  B1_static_large         0.530  100.0%     0.6361     0.0%   100%    0.833
+  B2_static_small         0.650  122.6%     0.2386    62.5%     0%    2.724
+  B3_random_50            0.583  110.1%     0.4390    31.0%    50%    1.329
+  B4_blind_cascade        0.640  120.8%     0.3473    45.4%    17%    1.843
+  GreenGate_t1.0          0.650  122.6%     0.3821    39.9%    23%    1.701
+==============================================================================
+
+Wrote a100_Qwen2.5-3B-Instruct/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
+### Qwen2.5-7B-Instruct
+  B1_static_large         0.530  100.0%     0.6497     0.0%   100%    0.816
+  B2_static_small         0.687  129.6%     0.3041    53.2%     0%    2.258
+  B3_random_50            0.593  111.9%     0.4783    26.4%    50%    1.240
+  B4_blind_cascade        0.687  129.6%     0.3620    44.3%    10%    1.897
+  GreenGate_t1.0          0.673  127.0%     0.4033    37.9%    15%    1.670
+==============================================================================
+
+Wrote a100_Qwen2.5-7B-Instruct/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
