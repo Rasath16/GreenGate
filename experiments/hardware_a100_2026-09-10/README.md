@@ -63,81 +63,51 @@ run_all.log                 full console output of all four runs
 a100_<model>/records.csv    per-question energy, carbon, entropy, correctness
 a100_<model>/summary.csv    policy comparison (B1-B4 and GreenGate)
 a100_<model>/threshold_sweep.csv
-compare_hardware.py         regenerates the comparison below
-hardware_comparison.csv     output of compare_hardware.py
 ```
 
-Reproduce the comparison from the repository root:
+This run is one of three. The comparison across all of them lives at
+`experiments/compare_hardware.py`; reproduce it from the repository root:
 
 ```
-python experiments/hardware_a100_2026-09-10/compare_hardware.py
+python experiments/compare_hardware.py
 ```
 
 ## Results
 
-Energy over 300 questions, in joules:
+See `experiments/compare_hardware.py` for the full three-accelerator table
+(T4, A100, H100). This run's own figures, over 300 questions:
 
-| Small model | T4 small | A100 small | T4 large | A100 large | T4 ratio | A100 ratio |
+| Small model | Small tier (J) | Large tier (J) | C_s/C_l | Mean entropy | Carbon cut | Retention |
 | --- | --- | --- | --- | --- | --- | --- |
-| Qwen2.5-1.5B | 1317.6 | 930.0 | 4848.0 | 3998.2 | 3.68 | 4.30 |
-| Qwen2.5-3B | 1866.4 | 1507.0 | 4508.8 | 4017.5 | 2.42 | 2.67 |
-| Qwen2.5-7B | 2270.3 | 1920.9 | 4933.0 | 4103.4 | 2.17 | 2.14 |
-
-Quantities that should not depend on the GPU, and do not:
-
-| Small model | T4 accuracy | A100 accuracy | T4 mean entropy | A100 mean entropy |
-| --- | --- | --- | --- | --- |
-| Qwen2.5-1.5B | 0.570 | 0.567 | 0.808 | 0.808 |
-| Qwen2.5-3B | 0.653 | 0.650 | 0.488 | 0.488 |
-| Qwen2.5-7B | 0.687 | 0.687 | 0.355 | 0.355 |
-
-Mean entropy is identical to three decimal places on all three model pairs.
-Small-model accuracy differs by at most one question in 300, consistent with
-floating-point non-determinism between Turing and Ampere kernels.
-
-GreenGate at threshold 1.0:
-
-| Small model | T4 carbon cut | A100 carbon cut | T4 retention | A100 retention |
-| --- | --- | --- | --- | --- |
-| Qwen2.5-1.5B | 26.2% | 31.1% | 110.6% | 111.3% |
-| Qwen2.5-3B | 35.1% | 39.9% | 121.2% | 122.6% |
-| Qwen2.5-7B | 37.8% | 37.9% | 126.2% | 127.0% |
+| Qwen2.5-0.5B | 542.4 | 3983.6 | 0.136 | 1.478 | 4.2% | 100.0% |
+| Qwen2.5-1.5B | 930.0 | 3998.2 | 0.233 | 0.808 | 31.1% | 111.3% |
+| Qwen2.5-3B | 1507.0 | 4017.5 | 0.375 | 0.488 | 39.9% | 122.6% |
+| Qwen2.5-7B | 1920.9 | 4103.4 | 0.468 | 0.355 | 37.9% | 127.0% |
 
 ## Interpretation
 
-The A100 draws 5.7 times the board power of the T4 yet consumes 15 to 30 per
-cent *less* energy for the same work, because it finishes far sooner. Energy
-is power integrated over time, and on this workload the speed advantage more
-than offsets the higher draw.
+Mean choice entropy matches the T4 and H100 runs to three decimal places on
+every model, and small-tier accuracy differs by at most one question in 300.
+The routing signal is a property of the model and the question, not of the
+accelerator.
 
-The quantity that governs the break-even condition
-`S = 1 - (C_s / C_l) - e` is the small-to-large cost ratio `C_s / C_l`. It
-moves modestly and, for the two smaller cascades, favourably: 0.272 to 0.233
-for the 1.5B pair and 0.414 to 0.375 for the 3B pair, while the 7B pair is
-essentially unchanged at 0.460 to 0.468. Measured carbon reduction therefore
-holds or improves on the newer hardware rather than eroding.
+The A100 draws 5.7 times the board power of the T4 yet consumes 15 to 20 per
+cent less energy for the same work, because it finishes sooner. Energy is
+power integrated over time, so thermal design power is a poor proxy for
+environmental cost.
 
-The practical claim this supports is narrow but real: the *routing decision*
-transfers across hardware unchanged, because the confidence signal it depends
-on is a property of the model and the question, not of the accelerator. The
-*magnitude* of the saving does depend on the accelerator, which is why the
-absolute carbon figures in this thesis are reported alongside the hardware
-that produced them.
+On the cost ratio C_s/C_l that governs the break-even condition, this run
+alone appears to show an improvement over the T4 (0.272 to 0.233 for the 1.5B
+pair). **That reading does not survive the H100 run**, which returns 0.275
+for the same pair. Across all three accelerators the ratio varies within a
+modest band that is not ordered by hardware generation. The conclusion the
+full series supports is bounded variation, not directional improvement; see
+`experiments/hardware_h100_2026-09-10/README.md` and thesis Section 6.5.7.
 
-## Excluded from the comparison
+## Excluded from the cross-hardware comparison
 
-The T4 Qwen2.5-0.5B run in `results/records.csv` is **not** used above. Its
-escalation rate at threshold 1.0 is 64.7 per cent, whereas the A100 0.5B run
-reports 82.3 per cent and a separate partial H100 run reports 82 per cent.
-The two later runs agree with each other and disagree with the T4 one, which
-predates the August 2026 profiler and entropy corrections. It is therefore
-treated as not comparable rather than reported as a hardware effect.
-
-## Partial H100 run
-
-An earlier attempt on an H100 SXM (80 GB HBM3, 700 W) on the same date
-completed two of the four model pairs before hitting a network-volume disk
-quota. Its Qwen2.5-1.5B figures were 1094.6 J small, 3749.2 J large, ratio
-3.43, small accuracy 0.567, large accuracy 0.533. These are consistent with
-the A100 results and are noted here for completeness; the thesis comparison
-uses the complete A100 series.
+The T4 Qwen2.5-0.5B run in `results/records.csv` is not used. Its escalation
+rate at threshold 1.0 is 64.7 per cent, whereas both the A100 and H100 0.5B
+runs report 82.3 per cent and agree with each other. It predates the August
+2026 profiler correction and is therefore treated as not comparable rather
+than reported as a hardware effect.

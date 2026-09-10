@@ -1,0 +1,5 @@
+name, memory.total [MiB], power.max_limit [W], driver_version
+NVIDIA H100 80GB HBM3, 81559 MiB, 700.00 W, 570.195.03
+Python 3.10.12
+2.8.0+cu128 5.17.0
+59c30d19bee470748b4c37caad2abf54f3cc7c35

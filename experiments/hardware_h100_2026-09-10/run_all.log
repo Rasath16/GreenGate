@@ -1,0 +1,210 @@
+nohup: ignoring input
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+### Qwen2.5-0.5B
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading 300 MMLU questions...
+Generating test split:   0%|          | 0/14042 [00:00<?, ? examples/s]Generating test split:  50%|████▉     | 7000/14042 [00:00<00:00, 64185.67 examples/s]Generating test split: 100%|█████████▉| 14000/14042 [00:00<00:00, 60129.01 examples/s]Generating test split: 100%|██████████| 14042/14042 [00:00<00:00, 55895.34 examples/s]
+Generating validation split:   0%|          | 0/1531 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 1531/1531 [00:00<00:00, 19220.23 examples/s]
+Generating dev split:   0%|          | 0/285 [00:00<?, ? examples/s]Generating dev split: 100%|██████████| 285/285 [00:00<00:00, 5511.54 examples/s]
+Generating auxiliary_train split:   0%|          | 0/99842 [00:00<?, ? examples/s]Generating auxiliary_train split:   1%|          | 1000/99842 [00:00<00:10, 9099.93 examples/s]Generating auxiliary_train split:  14%|█▍        | 14000/99842 [00:00<00:01, 73797.27 examples/s]Generating auxiliary_train split:  22%|██▏       | 22000/99842 [00:00<00:01, 53497.68 examples/s]Generating auxiliary_train split:  29%|██▉       | 29000/99842 [00:00<00:01, 45718.99 examples/s]Generating auxiliary_train split:  42%|████▏     | 42000/99842 [00:00<00:01, 57773.70 examples/s]Generating auxiliary_train split:  49%|████▉     | 49000/99842 [00:00<00:00, 59470.45 examples/s]Generating auxiliary_train split:  57%|█████▋    | 57000/99842 [00:01<00:00, 52710.37 examples/s]Generating auxiliary_train split:  64%|██████▍   | 64000/99842 [00:01<00:00, 46919.28 examples/s]Generating auxiliary_train split:  80%|████████  | 80000/99842 [00:01<00:00, 69413.96 examples/s]Generating auxiliary_train split:  89%|████████▉ | 89000/99842 [00:01<00:00, 57465.18 examples/s]Generating auxiliary_train split:  97%|█████████▋| 97000/99842 [00:01<00:00, 54954.37 examples/s]Generating auxiliary_train split: 100%|██████████| 99842/99842 [00:01<00:00, 53833.01 examples/s]
+
+[1/2] Evaluating small model: Qwen/Qwen2.5-0.5B
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  38%|███▊      | 111/290 [00:00<00:00, 1079.46it/s]Loading weights:  92%|█████████▏| 267/290 [00:00<00:00, 1354.71it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1343.23it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+[2/2] Evaluating large model: mistralai/Mistral-7B-Instruct-v0.2
+Fetching 3 files:   0%|          | 0/3 [00:00<?, ?it/s]Fetching 3 files:  33%|███▎      | 1/3 [00:25<00:51, 25.53s/it]Fetching 3 files:  67%|██████▋   | 2/3 [00:29<00:13, 13.11s/it]Fetching 3 files: 100%|██████████| 3/3 [00:29<00:00,  9.99s/it]
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights:   1%|          | 2/291 [00:00<00:15, 18.67it/s]Loading weights:   3%|▎         | 10/291 [00:00<00:05, 51.81it/s]Loading weights:   7%|▋         | 20/291 [00:00<00:03, 72.96it/s]Loading weights:  11%|█         | 31/291 [00:00<00:03, 82.89it/s]Loading weights:  14%|█▍        | 41/291 [00:00<00:02, 83.35it/s]Loading weights:  18%|█▊        | 51/291 [00:00<00:02, 82.99it/s]Loading weights:  22%|██▏       | 63/291 [00:00<00:02, 92.17it/s]Loading weights:  25%|██▌       | 73/291 [00:00<00:02, 93.40it/s]Loading weights:  29%|██▉       | 85/291 [00:00<00:02, 98.18it/s]Loading weights:  33%|███▎      | 95/291 [00:01<00:02, 94.39it/s]Loading weights:  36%|███▌      | 105/291 [00:01<00:02, 91.21it/s]Loading weights:  40%|███▉      | 116/291 [00:01<00:01, 96.09it/s]Loading weights:  44%|████▎     | 127/291 [00:01<00:01, 98.83it/s]Loading weights:  47%|████▋     | 137/291 [00:01<00:01, 96.00it/s]Loading weights:  51%|█████     | 147/291 [00:01<00:01, 96.34it/s]Loading weights:  54%|█████▍    | 157/291 [00:01<00:01, 93.06it/s]Loading weights:  57%|█████▋    | 167/291 [00:01<00:01, 90.45it/s]Loading weights:  61%|██████    | 177/291 [00:01<00:01, 90.61it/s]Loading weights:  65%|██████▍   | 189/291 [00:02<00:01, 97.77it/s]Loading weights:  69%|██████▊   | 200/291 [00:02<00:00, 100.88it/s]Loading weights:  73%|███████▎  | 211/291 [00:02<00:00, 96.28it/s] Loading weights:  76%|███████▌  | 221/291 [00:02<00:00, 94.03it/s]Loading weights:  79%|███████▉  | 231/291 [00:02<00:00, 90.92it/s]Loading weights:  84%|████████▎ | 243/291 [00:02<00:00, 98.60it/s]Loading weights:  87%|████████▋ | 253/291 [00:02<00:00, 96.70it/s]Loading weights:  90%|█████████ | 263/291 [00:02<00:00, 97.52it/s]Loading weights:  94%|█████████▍| 273/291 [00:02<00:00, 97.68it/s]Loading weights:  97%|█████████▋| 283/291 [00:03<00:00, 90.99it/s]Loading weights: 100%|██████████| 291/291 [00:03<00:00, 92.15it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+==============================================================================
+  RESULTS  (300 MMLU questions, threshold = 1.0 bits)
+==============================================================================
+  Policy                    Acc  AccRet  Carbon(g)  CO2 cut   Esc%     gQoS
+  --------------------------------------------------------------------------
+  B1_static_large         0.533  100.0%     0.6379     0.0%   100%    0.836
+  B2_static_small         0.463   86.9%     0.1368    78.6%     0%    3.388
+  B3_random_50            0.477   89.4%     0.3829    40.0%    50%    1.245
+  B4_blind_cascade        0.527   98.8%     0.6484    -1.6%    80%    0.812
+  GreenGate_t1.0          0.533  100.0%     0.6636    -4.0%    82%    0.804
+==============================================================================
+
+Wrote h100_Qwen2.5-0.5B/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
+### Qwen2.5-1.5B-Instruct
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading 300 MMLU questions...
+
+[1/2] Evaluating small model: Qwen/Qwen2.5-1.5B-Instruct
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   6%|▌         | 20/338 [00:00<00:01, 198.81it/s]Loading weights:  29%|██▉       | 99/338 [00:00<00:00, 525.45it/s]Loading weights:  53%|█████▎    | 179/338 [00:00<00:00, 646.89it/s]Loading weights:  75%|███████▌  | 254/338 [00:00<00:00, 682.19it/s]Loading weights:  97%|█████████▋| 328/338 [00:00<00:00, 694.09it/s]Loading weights: 100%|██████████| 338/338 [00:00<00:00, 649.75it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+[2/2] Evaluating large model: mistralai/Mistral-7B-Instruct-v0.2
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights:   1%|▏         | 4/291 [00:00<00:09, 30.50it/s]Loading weights:   5%|▍         | 14/291 [00:00<00:04, 58.90it/s]Loading weights:   8%|▊         | 23/291 [00:00<00:03, 70.74it/s]Loading weights:  11%|█▏        | 33/291 [00:00<00:03, 75.28it/s]Loading weights:  14%|█▍        | 42/291 [00:00<00:03, 79.08it/s]Loading weights:  18%|█▊        | 51/291 [00:00<00:02, 80.85it/s]Loading weights:  21%|██        | 60/291 [00:00<00:02, 82.62it/s]Loading weights:  24%|██▎       | 69/291 [00:00<00:02, 83.13it/s]Loading weights:  27%|██▋       | 80/291 [00:01<00:02, 90.77it/s]Loading weights:  31%|███       | 90/291 [00:01<00:02, 90.85it/s]Loading weights:  34%|███▍      | 100/291 [00:01<00:02, 90.97it/s]Loading weights:  38%|███▊      | 112/291 [00:01<00:01, 94.88it/s]Loading weights:  42%|████▏     | 122/291 [00:01<00:01, 89.69it/s]Loading weights:  45%|████▌     | 132/291 [00:01<00:01, 87.09it/s]Loading weights:  51%|█████     | 148/291 [00:01<00:01, 101.47it/s]Loading weights:  55%|█████▍    | 159/291 [00:01<00:01, 94.45it/s] Loading weights:  58%|█████▊    | 169/291 [00:01<00:01, 94.14it/s]Loading weights:  62%|██████▏   | 180/291 [00:02<00:01, 96.86it/s]Loading weights:  65%|██████▌   | 190/291 [00:02<00:01, 95.61it/s]Loading weights:  69%|██████▊   | 200/291 [00:02<00:00, 95.43it/s]Loading weights:  73%|███████▎  | 211/291 [00:02<00:00, 94.04it/s]Loading weights:  76%|███████▌  | 221/291 [00:02<00:00, 90.73it/s]Loading weights:  79%|███████▉  | 231/291 [00:02<00:00, 92.66it/s]Loading weights:  84%|████████▍ | 244/291 [00:02<00:00, 100.86it/s]Loading weights:  88%|████████▊ | 256/291 [00:02<00:00, 99.30it/s] Loading weights:  91%|█████████▏| 266/291 [00:02<00:00, 91.69it/s]Loading weights:  95%|█████████▍| 276/291 [00:03<00:00, 84.18it/s]Loading weights:  98%|█████████▊| 285/291 [00:03<00:00, 85.18it/s]Loading weights: 100%|██████████| 291/291 [00:03<00:00, 89.72it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+==============================================================================
+  RESULTS  (300 MMLU questions, threshold = 1.0 bits)
+==============================================================================
+  Policy                    Acc  AccRet  Carbon(g)  CO2 cut   Esc%     gQoS
+  --------------------------------------------------------------------------
+  B1_static_large         0.533  100.0%     0.6120     0.0%   100%    0.872
+  B2_static_small         0.567  106.2%     0.1680    72.5%     0%    3.373
+  B3_random_50            0.520   97.5%     0.3879    36.6%    50%    1.341
+  B4_blind_cascade        0.567  106.2%     0.4231    30.9%    42%    1.339
+  GreenGate_t1.0          0.590  110.6%     0.4465    27.0%    45%    1.321
+==============================================================================
+
+Wrote h100_Qwen2.5-1.5B-Instruct/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
+### Qwen2.5-3B-Instruct
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading 300 MMLU questions...
+
+[1/2] Evaluating small model: Qwen/Qwen2.5-3B-Instruct
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]Fetching 2 files:  50%|█████     | 1/2 [00:15<00:15, 15.41s/it]Fetching 2 files: 100%|██████████| 2/2 [00:19<00:00,  8.70s/it]Fetching 2 files: 100%|██████████| 2/2 [00:19<00:00,  9.70s/it]
+Loading weights:   0%|          | 0/434 [00:00<?, ?it/s]Loading weights:   2%|▏         | 9/434 [00:00<00:04, 86.00it/s]Loading weights:  12%|█▏        | 51/434 [00:00<00:01, 265.47it/s]Loading weights:  26%|██▌       | 111/434 [00:00<00:00, 401.20it/s]Loading weights:  37%|███▋      | 159/434 [00:00<00:00, 423.18it/s]Loading weights:  47%|████▋     | 202/434 [00:00<00:00, 409.93it/s]Loading weights:  58%|█████▊    | 251/434 [00:00<00:00, 433.74it/s]Loading weights:  68%|██████▊   | 295/434 [00:00<00:00, 419.68it/s]Loading weights:  78%|███████▊  | 339/434 [00:00<00:00, 420.29it/s]Loading weights:  89%|████████▉ | 387/434 [00:00<00:00, 432.93it/s]Loading weights: 100%|██████████| 434/434 [00:01<00:00, 416.53it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+[2/2] Evaluating large model: mistralai/Mistral-7B-Instruct-v0.2
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights:   1%|          | 2/291 [00:00<00:15, 18.33it/s]Loading weights:   3%|▎         | 8/291 [00:00<00:06, 41.93it/s]Loading weights:   6%|▌         | 18/291 [00:00<00:04, 66.42it/s]Loading weights:  10%|▉         | 28/291 [00:00<00:03, 77.09it/s]Loading weights:  14%|█▎        | 40/291 [00:00<00:02, 85.79it/s]Loading weights:  17%|█▋        | 50/291 [00:00<00:02, 85.93it/s]Loading weights:  21%|██        | 60/291 [00:00<00:02, 86.07it/s]Loading weights:  25%|██▍       | 72/291 [00:00<00:02, 94.23it/s]Loading weights:  29%|██▉       | 85/291 [00:00<00:02, 99.27it/s]Loading weights:  33%|███▎      | 95/291 [00:01<00:02, 96.26it/s]Loading weights:  36%|███▌      | 105/291 [00:01<00:01, 93.68it/s]Loading weights:  41%|████      | 118/291 [00:01<00:01, 102.58it/s]Loading weights:  45%|████▍     | 130/291 [00:01<00:01, 103.07it/s]Loading weights:  48%|████▊     | 141/291 [00:01<00:01, 95.43it/s] Loading weights:  53%|█████▎    | 154/291 [00:01<00:01, 103.41it/s]Loading weights:  57%|█████▋    | 166/291 [00:01<00:01, 104.20it/s]Loading weights:  61%|██████    | 177/291 [00:01<00:01, 97.17it/s] Loading weights:  65%|██████▍   | 189/291 [00:02<00:00, 102.86it/s]Loading weights:  69%|██████▉   | 202/291 [00:02<00:00, 104.14it/s]Loading weights:  73%|███████▎  | 213/291 [00:02<00:00, 96.25it/s] Loading weights:  78%|███████▊  | 226/291 [00:02<00:00, 103.70it/s]Loading weights:  82%|████████▏ | 238/291 [00:02<00:00, 104.38it/s]Loading weights:  86%|████████▌ | 249/291 [00:02<00:00, 96.38it/s] Loading weights:  90%|█████████ | 262/291 [00:02<00:00, 103.32it/s]Loading weights:  94%|█████████▍| 273/291 [00:02<00:00, 105.04it/s]Loading weights:  98%|█████████▊| 284/291 [00:02<00:00, 95.69it/s] Loading weights: 100%|██████████| 291/291 [00:03<00:00, 95.94it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+==============================================================================
+  RESULTS  (300 MMLU questions, threshold = 1.0 bits)
+==============================================================================
+  Policy                    Acc  AccRet  Carbon(g)  CO2 cut   Esc%     gQoS
+  --------------------------------------------------------------------------
+  B1_static_large         0.533  100.0%     0.6322     0.0%   100%    0.844
+  B2_static_small         0.650  121.9%     0.2329    63.2%     0%    2.791
+  B3_random_50            0.587  110.0%     0.4288    32.2%    50%    1.368
+  B4_blind_cascade        0.640  120.0%     0.3411    46.0%    17%    1.876
+  GreenGate_t1.0          0.650  121.9%     0.3775    40.3%    23%    1.722
+==============================================================================
+
+Wrote h100_Qwen2.5-3B-Instruct/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
+### Qwen2.5-7B-Instruct
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading 300 MMLU questions...
+
+[1/2] Evaluating small model: Qwen/Qwen2.5-7B-Instruct
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files:  25%|██▌       | 1/4 [00:25<01:16, 25.50s/it]Fetching 4 files:  50%|█████     | 2/4 [00:28<00:25, 12.56s/it]Fetching 4 files:  75%|███████▌  | 3/4 [00:29<00:07,  7.25s/it]Fetching 4 files: 100%|██████████| 4/4 [00:43<00:00,  9.60s/it]Fetching 4 files: 100%|██████████| 4/4 [00:43<00:00, 10.79s/it]
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<01:50,  3.07it/s]Loading weights:   1%|          | 2/339 [00:00<01:14,  4.50it/s]Loading weights:   8%|▊         | 28/339 [00:00<00:04, 65.17it/s]Loading weights:  12%|█▏        | 40/339 [00:00<00:03, 79.03it/s]Loading weights:  16%|█▌        | 54/339 [00:00<00:03, 93.10it/s]Loading weights:  22%|██▏       | 76/339 [00:00<00:02, 111.11it/s]Loading weights:  29%|██▉       | 100/339 [00:01<00:01, 126.69it/s]Loading weights:  34%|███▎      | 114/339 [00:01<00:01, 124.96it/s]Loading weights:  40%|████      | 136/339 [00:01<00:01, 139.90it/s]Loading weights:  47%|████▋     | 160/339 [00:01<00:01, 135.50it/s]Loading weights:  54%|█████▍    | 184/339 [00:01<00:01, 137.06it/s]Loading weights:  61%|██████▏   | 208/339 [00:01<00:00, 138.52it/s]Loading weights:  68%|██████▊   | 232/339 [00:02<00:00, 154.30it/s]Loading weights:  73%|███████▎  | 248/339 [00:02<00:00, 144.56it/s]Loading weights:  79%|███████▉  | 268/339 [00:02<00:00, 147.95it/s]Loading weights:  84%|████████▍ | 284/339 [00:02<00:00, 146.93it/s]Loading weights:  90%|████████▉ | 304/339 [00:02<00:00, 148.40it/s]Loading weights:  94%|█████████▍| 319/339 [00:02<00:00, 134.82it/s]Loading weights: 100%|██████████| 339/339 [00:02<00:00, 123.27it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+[2/2] Evaluating large model: mistralai/Mistral-7B-Instruct-v0.2
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights:   1%|▏         | 4/291 [00:00<00:09, 29.81it/s]Loading weights:   5%|▍         | 14/291 [00:00<00:04, 58.90it/s]Loading weights:   8%|▊         | 23/291 [00:00<00:03, 70.18it/s]Loading weights:  11%|█▏        | 33/291 [00:00<00:03, 75.31it/s]Loading weights:  14%|█▍        | 42/291 [00:00<00:03, 79.17it/s]Loading weights:  18%|█▊        | 51/291 [00:00<00:02, 81.56it/s]Loading weights:  21%|██        | 60/291 [00:00<00:02, 83.03it/s]Loading weights:  24%|██▎       | 69/291 [00:00<00:02, 83.48it/s]Loading weights:  27%|██▋       | 80/291 [00:01<00:02, 91.23it/s]Loading weights:  31%|███       | 90/291 [00:01<00:02, 92.05it/s]Loading weights:  34%|███▍      | 100/291 [00:01<00:02, 91.35it/s]Loading weights:  38%|███▊      | 112/291 [00:01<00:01, 94.90it/s]Loading weights:  42%|████▏     | 122/291 [00:01<00:01, 91.54it/s]Loading weights:  45%|████▌     | 132/291 [00:01<00:01, 88.16it/s]Loading weights:  51%|█████     | 148/291 [00:01<00:01, 103.81it/s]Loading weights:  55%|█████▍    | 159/291 [00:01<00:01, 95.49it/s] Loading weights:  58%|█████▊    | 169/291 [00:01<00:01, 95.81it/s]Loading weights:  62%|██████▏   | 179/291 [00:02<00:01, 96.84it/s]Loading weights:  65%|██████▍   | 189/291 [00:02<00:01, 95.40it/s]Loading weights:  68%|██████▊   | 199/291 [00:02<00:00, 95.20it/s]Loading weights:  73%|███████▎  | 211/291 [00:02<00:00, 96.05it/s]Loading weights:  76%|███████▌  | 221/291 [00:02<00:00, 93.84it/s]Loading weights:  80%|████████  | 234/291 [00:02<00:00, 102.45it/s]Loading weights:  85%|████████▍ | 247/291 [00:02<00:00, 103.18it/s]Loading weights:  89%|████████▊ | 258/291 [00:02<00:00, 94.29it/s] Loading weights:  92%|█████████▏| 268/291 [00:02<00:00, 94.07it/s]Loading weights:  96%|█████████▌| 278/291 [00:03<00:00, 93.21it/s]Loading weights:  99%|█████████▉| 288/291 [00:03<00:00, 93.33it/s]Loading weights: 100%|██████████| 291/291 [00:03<00:00, 91.12it/s]
+  25/300
+  50/300
+  75/300
+  100/300
+  125/300
+  150/300
+  175/300
+  200/300
+  225/300
+  250/300
+  275/300
+  300/300
+
+==============================================================================
+  RESULTS  (300 MMLU questions, threshold = 1.0 bits)
+==============================================================================
+  Policy                    Acc  AccRet  Carbon(g)  CO2 cut   Esc%     gQoS
+  --------------------------------------------------------------------------
+  B1_static_large         0.533  100.0%     0.6350     0.0%   100%    0.840
+  B2_static_small         0.687  128.8%     0.2852    55.1%     0%    2.408
+  B3_random_50            0.593  111.2%     0.4571    28.0%    50%    1.298
+  B4_blind_cascade        0.687  128.8%     0.3467    45.4%    10%    1.980
+  GreenGate_t1.0          0.673  126.2%     0.3795    40.2%    15%    1.774
+==============================================================================
+
+Wrote h100_Qwen2.5-7B-Instruct/records.csv, summary.csv, threshold_sweep.csv
+matplotlib not installed — skipping Pareto plot
