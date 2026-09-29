@@ -1,0 +1,6 @@
+policy,accuracy,carbon_g,escalation_rate
+B1_static_large,0.746,2.44981,1.0
+B2_static_small,0.556,1.29933,0.0
+B3_random_50,0.654,1.84774,0.496
+B4_blind_cascade,0.598,1.59901,0.13
+GreenGate_c0.7842,0.598,1.69104,0.148

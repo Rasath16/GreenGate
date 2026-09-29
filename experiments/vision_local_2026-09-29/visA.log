@@ -1,0 +1,42 @@
+nohup: ignoring input
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] Model config: pad_token_id must be `None` or an integer within the vocabulary (between 0 and 31999), got 128002. This may result in unexpected behavior.
+Small VLM: HuggingFaceTB/SmolVLM-Instruct | Large: Qwen/Qwen2-VL-7B-Instruct [local, measured]
+Loading weights:   0%|          | 0/657 [00:00<?, ?it/s]Loading weights:   5%|▌         | 34/657 [00:00<00:01, 339.44it/s]Loading weights:  10%|█         | 68/657 [00:00<00:02, 293.62it/s]Loading weights:  15%|█▍        | 98/657 [00:00<00:02, 219.98it/s]Loading weights:  19%|█▊        | 122/657 [00:00<00:02, 220.10it/s]Loading weights:  22%|██▏       | 146/657 [00:00<00:02, 221.92it/s]Loading weights:  26%|██▌       | 169/657 [00:00<00:02, 206.93it/s]Loading weights:  30%|██▉       | 194/657 [00:00<00:02, 195.92it/s]Loading weights:  33%|███▎      | 215/657 [00:01<00:02, 194.58it/s]Loading weights:  56%|█████▋    | 371/657 [00:01<00:00, 561.29it/s]Loading weights:  80%|███████▉  | 525/657 [00:01<00:00, 829.36it/s]Loading weights: 100%|██████████| 657/657 [00:01<00:00, 505.99it/s]
+Loading weights:   0%|          | 0/730 [00:00<?, ?it/s]Loading weights:   0%|          | 1/730 [00:00<01:33,  7.84it/s]Loading weights:   0%|          | 2/730 [00:00<01:41,  7.20it/s]Loading weights:   2%|▏         | 12/730 [00:00<00:17, 42.11it/s]Loading weights:   4%|▍         | 29/730 [00:00<00:08, 82.22it/s]Loading weights:   7%|▋         | 52/730 [00:00<00:05, 124.78it/s]Loading weights:   9%|▉         | 66/730 [00:00<00:05, 128.17it/s]Loading weights:  12%|█▏        | 88/730 [00:00<00:04, 155.11it/s]Loading weights:  14%|█▍        | 104/730 [00:00<00:04, 150.28it/s]Loading weights:  17%|█▋        | 124/730 [00:01<00:03, 163.87it/s]Loading weights:  19%|█▉        | 141/730 [00:01<00:03, 157.11it/s]Loading weights:  22%|██▏       | 161/730 [00:01<00:03, 161.14it/s]Loading weights:  24%|██▍       | 178/730 [00:01<00:03, 158.14it/s]Loading weights:  27%|██▋       | 197/730 [00:01<00:03, 160.15it/s]Loading weights:  30%|███       | 220/730 [00:01<00:02, 170.67it/s]Loading weights:  33%|███▎      | 238/730 [00:01<00:02, 165.68it/s]Loading weights:  35%|███▌      | 257/730 [00:01<00:02, 164.61it/s]Loading weights:  38%|███▊      | 274/730 [00:01<00:02, 164.70it/s]Loading weights:  40%|████      | 293/730 [00:02<00:02, 170.46it/s]Loading weights:  43%|████▎     | 312/730 [00:02<00:02, 175.05it/s]Loading weights:  45%|████▌     | 330/730 [00:02<00:02, 165.79it/s]Loading weights:  64%|██████▍   | 468/730 [00:02<00:00, 502.51it/s]Loading weights:  85%|████████▍ | 617/730 [00:02<00:00, 778.75it/s]Loading weights: 100%|█████████▉| 727/730 [00:02<00:00, 849.34it/s]Loading weights: 100%|██████████| 730/730 [00:02<00:00, 282.06it/s]
+  25/500
+  50/500
+  75/500
+  100/500
+  125/500
+  150/500
+  175/500
+  200/500
+  225/500
+  250/500
+  275/500
+  300/500
+  325/500
+  350/500
+  375/500
+  400/500
+  425/500
+  450/500
+  475/500
+  500/500
+
+==========================================================================
+  VISION ROUTING (VQAv2, 500 questions, conf threshold=0.7386)
+==========================================================================
+  Policy                    Acc     Ret  Carbon(g)  CO2 cut  Esc%
+  B1_static_large         0.746  100.0%     2.4620     0.0%  100%
+  B2_static_small         0.672   90.1%     2.5830    -4.9%    0%
+  B3_random_50            0.714   95.7%     2.5473    -3.5%   50%
+  B4_blind_cascade        0.684   91.7%     2.6756    -8.7%    4%
+  GreenGate_c0.7386       0.678   90.9%     2.7316   -10.9%    5%
+==========================================================================
+  signal: mean conf when correct=0.940 vs wrong=0.847
+
+Wrote vision_records.jsonl, vision_summary.csv, vision_sweep.csv

@@ -1,0 +1,4 @@
+name, power.max_limit [W], driver_version
+NVIDIA A100-SXM4-80GB, 400.00 W, 570.211.01
+2.8.0+cu128 5.17.0
+81c41b7f7efd59752faad21886fccb178e123031
