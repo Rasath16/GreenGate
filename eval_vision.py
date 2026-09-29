@@ -46,6 +46,10 @@ def main():
     ap.add_argument("--small", default="HuggingFaceTB/SmolVLM-Instruct")
     ap.add_argument("--small-4bit", action="store_true")
     ap.add_argument("--large", default="gpt-4o-mini")
+    ap.add_argument("--large-local", default=None,
+                    help="run a local VLM as the large tier instead of the API, so that both "
+                         "tiers are physically measured on the same hardware")
+    ap.add_argument("--large-4bit", action="store_true")
     ap.add_argument("--dry-run-api", action="store_true")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--outdir", default="results")
@@ -62,10 +66,19 @@ def main():
             done[rec["idx"]] = rec
         print(f"resuming: {len(done)} records complete")
 
-    print(f"Small VLM: {args.small} | Large: {args.large}"
-          + (" [DRY RUN]" if args.dry_run_api else ""))
+    large_name = args.large_local or args.large
+    print(f"Small VLM: {args.small} | Large: {large_name}"
+          + (" [local, measured]" if args.large_local else
+             " [DRY RUN]" if args.dry_run_api else " [API, estimated]"))
     small = SmallVisionModel(args.small, load_in_4bit=args.small_4bit)
-    large = APILargeTier(model=args.large, max_tokens=60, dry_run=args.dry_run_api)
+    if args.large_local:
+        # Same wrapper as the small tier, so both tiers share the prompt, the
+        # generation settings and the measurement path. This makes the carbon
+        # columns commensurable and removes the response-format asymmetry that
+        # penalises an API generalist under exact-match scoring.
+        large = SmallVisionModel(args.large_local, load_in_4bit=args.large_4bit)
+    else:
+        large = APILargeTier(model=args.large, max_tokens=60, dry_run=args.dry_run_api)
 
     records = []
     with open(out_path, "a", encoding="utf-8") as f:
@@ -74,8 +87,15 @@ def main():
                 records.append(done[i])
                 continue
             s = small.answer(item["image"], item["question"])
-            prompt = f"{item['question']} Answer briefly."
-            l = large.query_vision(prompt, item["image"])
+            if args.large_local:
+                l = large.answer(item["image"], item["question"])
+                large_carbon, large_source = l.carbon_grams, "measured"
+                large_energy = l.energy_joules
+            else:
+                prompt = f"{item['question']} Answer briefly."
+                l = large.query_vision(prompt, item["image"])
+                large_carbon, large_source = l.carbon_grams, l.carbon_source
+                large_energy = None
             rec = {
                 "idx": i, "question": item["question"],
                 "gt_answer": item["answer"],
@@ -88,9 +108,10 @@ def main():
                 "small_latency_s": s.latency_s,
                 "large_response": l.response,
                 "large_correct": int(vqa_match(l.response, item["answer"])),
-                "large_carbon_g": l.carbon_grams,
+                "large_carbon_g": large_carbon,
+                "large_energy_j": large_energy,
                 "large_latency_s": l.latency_s,
-                "large_carbon_source": l.carbon_source,
+                "large_carbon_source": large_source,
             }
             records.append(rec)
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
