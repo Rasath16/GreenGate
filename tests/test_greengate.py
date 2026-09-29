@@ -70,3 +70,63 @@ def test_preset_registry_has_mistral():
 def test_unknown_model_falls_back_uncalibrated():
     T, source = _load_temperature("no-such/model")
     assert (T, source) == (1.0, "uncalibrated")
+
+
+# --------------------------------------------------------------------------
+# Measurement-only API (T10-T14): profiling inference GreenGate does not run
+# --------------------------------------------------------------------------
+
+def test_measure_records_energy_and_per_query_figures():
+    import greengate
+    with greengate.measure(n_queries=4, label="unit") as m:
+        sum(i * i for i in range(50_000))
+    assert m.duration_s > 0
+    assert m.energy_joules > 0
+    assert m.n_queries == 4
+    assert abs(m.energy_per_query_j - m.energy_joules / 4) < 1e-9
+    assert "unit" in m.report()
+
+
+def test_measure_reports_gpu_exclusivity():
+    """A measurement must say whether it had the device to itself, because
+    device-level power cannot be split between concurrent processes."""
+    import greengate
+    with greengate.measure() as m:
+        pass
+    assert isinstance(m.exclusive, bool)
+    assert m.exclusive == (not m.shared_with)
+
+
+def test_should_cascade_matches_the_break_even_condition():
+    from greengate import should_cascade
+    r = should_cascade(carbon_small=0.05, carbon_large=0.20, escalation_rate=0.30)
+    assert abs(r["cost_ratio_small_over_large"] - 0.25) < 1e-9
+    assert abs(r["break_even_escalation_rate"] - 0.75) < 1e-9
+    assert abs(r["predicted_saving"] - 0.45) < 1e-9        # 1 - 0.25 - 0.30
+    assert r["headroom"] > 0
+
+
+def test_should_cascade_rejects_a_small_tier_that_is_not_cheaper():
+    """The measured SmolVLM-2B vision pair: C_s/C_l > 1, so no escalation
+    rate can save energy."""
+    from greengate import should_cascade
+    r = should_cascade(carbon_small=2.5830, carbon_large=2.4620, escalation_rate=0.05)
+    assert r["cost_ratio_small_over_large"] > 1.0
+    assert r["predicted_saving"] < 0
+    assert "not cheaper" in r["verdict"]
+
+
+def test_service_ledger_aggregates_batched_windows():
+    """Under batching, per-query attribution is impossible; the ledger works
+    from totals over windows of work instead."""
+    from greengate import ServiceLedger
+    led = ServiceLedger()
+    led.add(tier="small", queries=100, carbon_grams=5.0)    # 0.05 g per query
+    led.add(tier="large", queries=30, carbon_grams=6.0)     # 0.20 g per query
+    rep = led.report()
+    assert rep["small_tier_queries"] == 100
+    assert abs(rep["escalation_rate"] - 0.30) < 1e-9
+    assert abs(rep["cost_ratio_small_over_large"] - 0.25) < 1e-9
+    assert abs(rep["predicted_saving"] - 0.45) < 1e-9
+    assert abs(rep["total_carbon_grams"] - 11.0) < 1e-9
+    assert abs(rep["wasted_carbon_grams"] - 1.5) < 1e-9     # 30 discarded small runs

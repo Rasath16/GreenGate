@@ -71,11 +71,86 @@ gw.config(threshold=2.9)     # or set the entropy threshold explicitly
 gw.config(budget_g=0.05)     # sliding-window carbon ceiling; escalation defers when exhausted
 ```
 
+## Measuring inference you already run
+
+The routing API above loads both tiers itself, which suits a controlled
+comparison but not a service that already serves models through vLLM, TGI,
+Ollama or a provider SDK. To profile an existing pipeline without
+restructuring it, use the measurement API on its own:
+
+```python
+import greengate
+
+with greengate.measure(n_queries=1, label="checkout-summariser") as m:
+    answer = my_existing_pipeline(prompt)
+
+print(m.report())
+# checkout-summariser: 1 query in 2.914 s
+#   431.72 J total, 431.72 J per query
+#   0.068 g CO2 total, 0.068 g per query
+#   148.2 W average, measured by gpu (pynvml)
+```
+
+Power is sampled per device, so anything else on the same GPU is counted in.
+A measurement that shared the device says so, and `strict=True` raises instead
+of warning:
+
+```python
+with greengate.measure(strict=True) as m:   # ContendedMeasurement if not alone
+    ...
+```
+
+### Deciding whether a cascade is worth it
+
+A cascade runs the small tier on every query and the large tier on the
+escalated fraction, so relative to always using the large tier the saving is
+`S = 1 - C_s/C_l - e`. Feed it measured costs:
+
+```python
+greengate.should_cascade(carbon_small=0.05, carbon_large=0.20,
+                         escalation_rate=0.30)
+# {'cost_ratio_small_over_large': 0.25,
+#  'break_even_escalation_rate': 0.75,
+#  'headroom': 0.45,
+#  'predicted_saving': 0.45,
+#  'verdict': 'saves 45.0% against always using the large tier; escalation
+#              may rise to 75% before that is lost'}
+```
+
+If the small tier is not actually cheaper, it says so rather than reporting a
+saving. That case is real: in this project's vision experiments a 2B model cost
+more per query than a 4-bit 7B model, because image processing dominates and
+parameter count does not.
+
+### Services that batch
+
+Under continuous batching many requests share the GPU at once and no
+device-level meter can divide that energy between them. Rather than invent an
+attribution, account over windows of work:
+
+```python
+ledger = greengate.ServiceLedger()
+
+with greengate.measure(n_queries=128) as m:
+    serve_batch_on_small_tier(...)
+ledger.add(m, tier="small")
+
+with greengate.measure(n_queries=37) as m:
+    serve_batch_on_large_tier(...)
+ledger.add(m, tier="large")
+
+print(ledger.report())
+# realised escalation rate, mean per-query costs, wasted carbon from
+# discarded small-tier runs, and the break-even verdict
+```
+
 ## Honest limitations
 
 - On open-ended generation with small models, token entropy is a weak signal (near chance in our evaluation). It is informative on structured tasks and vision. Where it is weak, savings come from the cascade structure rather than from selective routing.
 - Energy measurement requires an NVIDIA GPU (NVML). CPU runs fall back to a documented estimate.
 - API-tier carbon is an estimate, not a measurement, and is not directly comparable to metered local figures.
+
+- Device-level power cannot be attributed to individual requests when several run concurrently; measure exclusively, or account over windows with `ServiceLedger`.
 
 ## Install extras
 

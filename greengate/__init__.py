@@ -1,7 +1,13 @@
 from greengate.core import GreenGate, RouteResult
+from greengate.measure import (ContendedMeasurement, Measurement,
+                               ServiceLedger, measure, should_cascade)
 
-__version__ = "0.1.0"
-__all__ = ["GreenGate", "RouteResult"]
+__version__ = "0.2.0"
+__all__ = [
+    "GreenGate", "RouteResult",
+    "measure", "Measurement", "ServiceLedger", "should_cascade",
+    "ContendedMeasurement",
+]
 
 
 def __getattr__(name):
