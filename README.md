@@ -162,7 +162,18 @@ pip install greengate[eval]   # pandas/matplotlib for the evaluation scripts
 
 ## Reproducing the evaluation
 
-The `RUNBOOK.md` in this repository reproduces every published number: calibration, three deployment configurations, four baselines, threshold sweeps, grid conditions, trace replay against real Azure arrival traces, and three ablation studies. Raw per-query records for all runs are in `experiments/`.
+The `RUNBOOK.md` in this repository reproduces every published number from scratch: calibration, three deployment configurations, four baselines, threshold sweeps, grid conditions, trace replay against real Azure arrival traces, and three ablation studies.
+
+Re-running the inference is not necessary to check the results. Raw per-query records for every run are published in `experiments/`, one directory per run with its own README. The analysis scripts read from `results/`, the working directory a live run produces, so populate it from the published evidence first:
+
+```bash
+python bootstrap_results.py    # copies experiments/ records into results/
+python eval_crossfamily.py     # and any other eval_*.py
+```
+
+Every figure in the study can then be recomputed offline, with no GPU and no API key. `bootstrap_results.py` also records which run each analysis input came from.
+
+`eval_split_stability.py` repeats the held-out protocol over 200 independent validation/test splits and 10 cross-validation draws, to show that the reported conclusions do not depend on the single split that was drawn.
 
 ## Citation
 
