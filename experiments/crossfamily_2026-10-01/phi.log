@@ -1,0 +1,32 @@
+nohup: ignoring input
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING: results/cal_Phi-3.5-mini-instruct.json not found — T=1.0 (run calibrate_mmlu.py --small microsoft/Phi-3.5-mini-instruct --outfile results/cal_Phi-3.5-mini-instruct.json first)
+Generating train split:   0%|          | 0/90665 [00:00<?, ? examples/s]Generating train split:   3%|▎         | 3000/90665 [00:00<00:04, 21364.92 examples/s]Generating train split:   9%|▉         | 8000/90665 [00:00<00:02, 30049.94 examples/s]Generating train split:  14%|█▍        | 13000/90665 [00:00<00:02, 32933.45 examples/s]Generating train split:  20%|█▉        | 18000/90665 [00:00<00:02, 34486.48 examples/s]Generating train split:  26%|██▌       | 23667/90665 [00:00<00:02, 33131.57 examples/s]Generating train split:  32%|███▏      | 28667/90665 [00:00<00:01, 34087.06 examples/s]Generating train split:  36%|███▌      | 32667/90665 [00:00<00:01, 34114.95 examples/s]Generating train split:  40%|████      | 36667/90665 [00:01<00:01, 34623.28 examples/s]Generating train split:  45%|████▍     | 40667/90665 [00:01<00:01, 34063.33 examples/s]Generating train split:  51%|█████     | 46333/90665 [00:01<00:01, 34120.99 examples/s]Generating train split:  56%|█████▌    | 50333/90665 [00:01<00:01, 35243.41 examples/s]Generating train split:  61%|██████    | 55333/90665 [00:01<00:01, 34841.68 examples/s]Generating train split:  67%|██████▋   | 60333/90665 [00:01<00:00, 35749.47 examples/s]Generating train split:  72%|███████▏  | 65333/90665 [00:01<00:00, 36089.59 examples/s]Generating train split:  76%|███████▌  | 68999/90665 [00:02<00:00, 36215.80 examples/s]Generating train split:  82%|████████▏ | 73999/90665 [00:02<00:00, 36944.09 examples/s]Generating train split:  86%|████████▌ | 77999/90665 [00:02<00:00, 37229.25 examples/s]Generating train split:  90%|█████████ | 81999/90665 [00:02<00:00, 37812.09 examples/s]Generating train split:  96%|█████████▌| 86999/90665 [00:02<00:00, 37011.96 examples/s]Generating train split: 100%|██████████| 90665/90665 [00:02<00:00, 35430.59 examples/s]
+[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.
+500 queries (same seed as eval_text.py -> same set)
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]Fetching 2 files:  50%|█████     | 1/2 [00:06<00:06,  6.37s/it]Fetching 2 files: 100%|██████████| 2/2 [00:07<00:00,  3.55s/it]Fetching 2 files: 100%|██████████| 2/2 [00:07<00:00,  3.97s/it]
+Loading weights:   0%|          | 0/195 [00:00<?, ?it/s]Loading weights:   3%|▎         | 5/195 [00:00<00:04, 44.73it/s]Loading weights:  12%|█▏        | 23/195 [00:00<00:01, 107.95it/s]Loading weights:  19%|█▉        | 37/195 [00:00<00:01, 121.23it/s]Loading weights:  26%|██▌       | 50/195 [00:00<00:01, 99.25it/s] Loading weights:  33%|███▎      | 64/195 [00:00<00:01, 110.18it/s]Loading weights:  39%|███▉      | 77/195 [00:00<00:01, 110.50it/s]Loading weights:  46%|████▌     | 89/195 [00:00<00:01, 94.58it/s] Loading weights:  54%|█████▍    | 106/195 [00:00<00:00, 113.21it/s]Loading weights:  61%|██████    | 119/195 [00:01<00:00, 114.59it/s]Loading weights:  68%|██████▊   | 132/195 [00:01<00:00, 113.02it/s]Loading weights:  74%|███████▍  | 144/195 [00:01<00:00, 99.92it/s] Loading weights:  79%|███████▉  | 155/195 [00:01<00:00, 101.78it/s]Loading weights:  86%|████████▌ | 167/195 [00:01<00:00, 105.35it/s]Loading weights:  93%|█████████▎| 182/195 [00:01<00:00, 97.71it/s] Loading weights: 100%|██████████| 195/195 [00:01<00:00, 106.45it/s]
+  25/500
+  50/500
+  75/500
+  100/500
+  125/500
+  150/500
+  175/500
+  200/500
+  225/500
+  250/500
+  275/500
+  300/500
+  325/500
+  350/500
+  375/500
+  400/500
+  425/500
+  450/500
+  475/500
+  500/500
+Done -> phi/qwen_records.jsonl
+Next: python make_main_records.py
