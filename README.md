@@ -24,7 +24,50 @@ print(r.response)     # answered by whichever tier was appropriate
 print(r.decision)     # "LOCAL" or "ESCALATE"
 print(r.carbon_g)     # gCO2 for this query, including any wasted small run
 
-gw.profile()          # session totals: carbon, escalation rate, latency
+gw.profile()          # session totals, plus the break-even verdict
+```
+
+### Should you cascade at all?
+
+That depends on how much cheaper your small tier is and how often your traffic
+escalates, and both are measurable. `audit()` runs **both** tiers over a sample
+of your own queries, so the cost ratio is measured rather than assumed, and
+every threshold is evaluated on the same data:
+
+```python
+gw.audit(my_sample_queries)      # a few dozen real queries is enough
+```
+```
+  cost ratio small/large   0.4684
+  break-even escalation    53.2%
+
+   escalate   threshold    saving
+        0%       never     53.2%
+       18%      10.266     34.8%
+       28%       9.766     24.8%
+       48%       9.000      4.8%
+       68%       8.382    -15.2%
+
+  cheapest option is the small tier alone, saving 53.2%. Escalate only as far
+  as your own quality measurements justify; every point of escalation costs
+  about a point of saving, and all saving is gone at 53%
+```
+
+Escalating costs the discarded small-model run on every escalated query, so a
+cascade only saves while the escalation rate stays below `1 - C_small/C_large`.
+Past that line it emits *more* than simply using the large tier, and `audit()`
+and `profile()` both say so in plain words.
+
+`audit()` reports cost, not quality: the library has no judge, so what
+escalation buys you has to come from your own evaluation.
+
+### Regional carbon intensity
+
+Grid intensity varies by more than twenty times between regions, so the default
+world average of 475 gCO2/kWh may be far from your own:
+
+```python
+gw = greengate.GreenGate(small=..., large=..., carbon_intensity=56)   # France
 ```
 
 ## Why this exists

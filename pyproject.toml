@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "greengate"
-version = "0.2.0"
+version = "0.3.0"
 description = "Confidence-aware cascading for green AI inference: route easy queries to a small local model, escalate only when uncertain, and account for the carbon honestly"
 readme = "README.md"
 requires-python = ">=3.10"

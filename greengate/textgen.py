@@ -25,7 +25,8 @@ class GenResult:
 class SmallTextModel:
     def __init__(self, model_name: str, temperature_T: float = 1.0,
                  max_new_tokens: int = 200, device: str | None = None,
-                 load_in_4bit: bool = False):
+                 load_in_4bit: bool = False,
+                 carbon_intensity: float | None = None):
         from transformers import AutoTokenizer, AutoModelForCausalLM
 
         self.T = temperature_T
@@ -55,7 +56,8 @@ class SmallTextModel:
         if device == "cpu":
             self.model = self.model.to("cpu")
         self.model.eval()
-        self.profiler = CarbonProfiler()
+        self.profiler = (CarbonProfiler(carbon_intensity=carbon_intensity)
+                         if carbon_intensity is not None else CarbonProfiler())
 
     def _chat_wrap(self, query: str) -> str:
         """Use the model's chat template when available (instruct models)."""

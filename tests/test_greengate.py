@@ -130,3 +130,117 @@ def test_service_ledger_aggregates_batched_windows():
     assert abs(rep["predicted_saving"] - 0.45) < 1e-9
     assert abs(rep["total_carbon_grams"] - 11.0) < 1e-9
     assert abs(rep["wasted_carbon_grams"] - 1.5) < 1e-9     # 30 discarded small runs
+
+
+# --------------------------------------------------------------------- #
+# profile() reporting the break-even verdict, and audit() deciding
+# whether to cascade before anything is deployed. Both are exercised
+# without loading a model.
+# --------------------------------------------------------------------- #
+
+from dataclasses import dataclass as _dataclass
+
+from greengate.core import GreenGate, _Session, MIN_LARGE_CALLS_FOR_VERDICT
+
+
+def _bare_gate(session: _Session) -> GreenGate:
+    """A GreenGate with a session but no models, for testing reporting."""
+    gw = object.__new__(GreenGate)
+    gw._session = session
+    gw._fixed_threshold = 0.5
+    gw._entropy_history = []
+    gw.mode = "balanced"
+    gw.small_name, gw.large_name = "small", "large"
+    gw.signal = "entropy"
+    return gw
+
+
+def test_profile_reports_verdict_once_the_large_tier_is_measured():
+    s = _Session(queries=100, escalated=30, carbon_g=10.0,
+                 small_carbon_g=5.0, large_carbon_g=30.0, large_calls=30)
+    p = _bare_gate(s).profile()
+    # mean small 0.05, mean large 1.0 -> ratio 0.05, break-even 95%
+    assert p["mean_small_carbon_g"] == 0.05
+    assert p["mean_large_carbon_g"] == 1.0
+    assert p["cost_ratio_small_over_large"] == 0.05
+    assert p["break_even_escalation_rate"] == 0.95
+    assert "saves" in p["verdict"]
+
+
+def test_profile_says_what_is_missing_before_it_can_decide():
+    s = _Session(queries=4, escalated=0, small_carbon_g=0.2)
+    p = _bare_gate(s).profile()
+    assert p["verdict"].startswith("no verdict yet")
+    assert "more queries" in p["verdict"]
+    assert f"{MIN_LARGE_CALLS_FOR_VERDICT} more escalations" in p["verdict"]
+    assert "cost_ratio_small_over_large" not in p
+
+
+def test_profile_verdict_turns_negative_past_break_even():
+    # small costs half of large, so break-even is 50%; escalating 80% must
+    # be reported as a loss rather than a saving
+    s = _Session(queries=10, escalated=8, small_carbon_g=5.0,
+                 large_carbon_g=8.0, large_calls=8)
+    p = _bare_gate(s).profile()
+    assert p["cost_ratio_small_over_large"] == 0.5
+    assert p["break_even_escalation_rate"] == 0.5
+    assert p["predicted_saving"] < 0
+    assert "costs" in p["verdict"]
+
+
+@_dataclass
+class _FakeGen:
+    carbon_grams: float
+    entropy_calibrated: float
+    response: str = ""
+
+
+class _FakeTier:
+    """Cost is fixed; entropy rises with query length, so ordering is known."""
+
+    def __init__(self, carbon):
+        self.carbon = carbon
+
+    def generate(self, q):
+        return _FakeGen(carbon_grams=self.carbon, entropy_calibrated=float(len(q)))
+
+
+def _audit_gate(small_cost, large_cost):
+    gw = object.__new__(GreenGate)
+    gw._small = _FakeTier(small_cost)
+    gw._large = _FakeTier(large_cost)
+    gw._large_is_api = False
+    return gw
+
+
+def test_audit_measures_the_cost_ratio_and_break_even():
+    qs = ["a" * i for i in range(1, 21)]
+    r = _audit_gate(0.25, 1.0).audit(qs, verbose=False)
+    assert r["queries_audited"] == 20
+    assert r["cost_ratio_small_over_large"] == 0.25
+    assert r["break_even_escalation_rate"] == 0.75
+
+
+def test_audit_thresholds_realise_the_requested_escalation_rates():
+    qs = ["a" * i for i in range(1, 21)]
+    r = _audit_gate(0.25, 1.0).audit(qs, rates=(0.0, 0.25, 0.5), verbose=False)
+    by_target = {row["target_rate"]: row for row in r["rows"]}
+    assert by_target[0.0]["realised_rate"] == 0.0
+    assert abs(by_target[0.25]["realised_rate"] - 0.25) <= 0.05
+    assert abs(by_target[0.5]["realised_rate"] - 0.5) <= 0.05
+    # saving falls as escalation rises
+    savings = [row["predicted_saving"] for row in r["rows"]]
+    assert savings == sorted(savings, reverse=True)
+
+
+def test_audit_refuses_a_small_tier_that_is_not_cheaper():
+    qs = ["a" * i for i in range(1, 11)]
+    r = _audit_gate(1.2, 1.0).audit(qs, verbose=False)
+    assert r["cost_ratio_small_over_large"] > 1.0
+    assert "do not cascade" in r["recommendation"]
+
+
+def test_audit_rejects_an_empty_sample():
+    import pytest
+    with pytest.raises(ValueError):
+        _audit_gate(0.5, 1.0).audit([], verbose=False)
