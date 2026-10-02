@@ -244,3 +244,76 @@ def test_audit_rejects_an_empty_sample():
     import pytest
     with pytest.raises(ValueError):
         _audit_gate(0.5, 1.0).audit([], verbose=False)
+
+
+# --------------------------------------------------------------------- #
+# A persisted gate: an auto-tuned threshold needs traffic, and a process
+# that restarts without it never leaves warm-up.
+# --------------------------------------------------------------------- #
+
+from pathlib import Path as _Path
+
+from greengate.core import MAX_HISTORY, SAVE_EVERY
+
+
+def _gate_with_state(tmp_path, history=None):
+    gw = object.__new__(GreenGate)
+    gw._session = _Session()
+    gw._fixed_threshold = None
+    gw._entropy_history = list(history or [])
+    gw.mode = "balanced"
+    gw.small_name, gw.large_name = "small/m", "large/m"
+    gw.signal = "entropy"
+    gw._state_path = _Path(tmp_path) / "gate.json"
+    gw._since_save = 0
+    return gw
+
+
+def test_saved_history_makes_a_restarted_gate_warm(tmp_path):
+    seen = [float(i) for i in range(40)]
+    _gate_with_state(tmp_path, seen).save_state()
+
+    restarted = _gate_with_state(tmp_path)
+    assert restarted._threshold() is None          # nothing loaded yet
+    restarted._load_state()
+    assert len(restarted._entropy_history) == 40
+    # balanced is the 60th percentile of 0..39
+    assert restarted._threshold() == seen[int(0.60 * 39)]
+
+
+def test_a_cold_gate_without_state_still_refuses_to_guess(tmp_path):
+    gw = _gate_with_state(tmp_path, history=[1.0, 2.0, 3.0])
+    assert gw._threshold() is None                 # under WARMUP_QUERIES
+
+
+def test_state_from_a_different_pairing_is_ignored(tmp_path):
+    _gate_with_state(tmp_path, [float(i) for i in range(40)]).save_state()
+
+    other = _gate_with_state(tmp_path)
+    other.small_name = "a/different-small"
+    other._load_state()
+    assert other._entropy_history == []            # not this pairing's traffic
+
+
+def test_unreadable_state_costs_a_warmup_not_a_crash(tmp_path):
+    bad = _Path(tmp_path) / "gate.json"
+    bad.write_text("{ this is not json")
+    gw = _gate_with_state(tmp_path)
+    gw._load_state()                               # must not raise
+    assert gw._entropy_history == []
+
+
+def test_history_is_capped_so_the_file_cannot_grow_without_bound(tmp_path):
+    gw = _gate_with_state(tmp_path, [float(i) for i in range(MAX_HISTORY + 500)])
+    gw.save_state()
+    restarted = _gate_with_state(tmp_path)
+    restarted._load_state()
+    assert len(restarted._entropy_history) == MAX_HISTORY
+    # the most recent observations are the ones kept
+    assert restarted._entropy_history[-1] == float(MAX_HISTORY + 499)
+
+
+def test_save_state_is_a_no_op_when_persistence_is_off(tmp_path):
+    gw = _gate_with_state(tmp_path, [1.0])
+    gw._state_path = None
+    assert gw.save_state() is None

@@ -15,6 +15,7 @@ Tier rules (by design, see thesis Ch.3):
           name ("gpt-4o-mini")
 """
 
+import hashlib
 import json
 import time
 from dataclasses import dataclass, field
@@ -22,10 +23,16 @@ from pathlib import Path
 
 PRESETS_PATH = Path(__file__).parent / "presets.json"
 USER_CALIBRATIONS = Path.home() / ".greengate" / "calibrations.json"
+STATE_DIR = Path.home() / ".greengate" / "state"
 
 # threshold percentile used while auto-tuning on the user's own traffic
 AUTO_THRESHOLD_PERCENTILE = {"green": 80, "balanced": 60, "quality": 35}
 WARMUP_QUERIES = 20
+# how many observations a persisted gate keeps, and how often it writes them.
+# The cap bounds the file and lets a long-lived deployment forget traffic it
+# has long since stopped receiving.
+MAX_HISTORY = 10_000
+SAVE_EVERY = 20
 # the break-even verdict is only reported once the large tier has been measured
 # often enough for its mean cost to mean anything
 MIN_LARGE_CALLS_FOR_VERDICT = 5
@@ -86,7 +93,9 @@ class GreenGate:
                  max_new_tokens: int = 200,
                  dry_run_api: bool = False,
                  large_is_api: bool | None = None,
-                 carbon_intensity: float | None = None):
+                 carbon_intensity: float | None = None,
+                 state_path: str | Path | None = None,
+                 persist: bool = False):
         if mode not in AUTO_THRESHOLD_PERCENTILE:
             raise ValueError(f"mode must be one of {list(AUTO_THRESHOLD_PERCENTILE)}")
         if signal not in ("entropy", "semantic"):
@@ -134,7 +143,54 @@ class GreenGate:
         self._semantic = None  # lazy — only if signal="semantic"
         self._session = _Session()
 
+        # An auto-tuned gate needs traffic before it can place a threshold, and
+        # without somewhere to keep that traffic a process that restarts often
+        # never leaves warm-up and so never escalates at all.
+        self._state_path = None
+        if state_path is not None:
+            self._state_path = Path(state_path).expanduser()
+        elif persist:
+            key = hashlib.sha1(
+                f"{small}|{large}|{mode}|{signal}".encode()).hexdigest()[:16]
+            self._state_path = STATE_DIR / f"{key}.json"
+        self._since_save = 0
+        if self._state_path is not None:
+            self._load_state()
+
     # ------------------------------------------------------------------ #
+
+    # --------------------------------------------------- persisted gate state
+
+    def _load_state(self) -> None:
+        """Restore the observations the gate had already seen, if any.
+
+        A corrupt or unreadable file is ignored rather than raised: losing the
+        history costs a warm-up, and that is never worth failing a request for.
+        """
+        try:
+            data = json.loads(self._state_path.read_text())
+        except (OSError, json.JSONDecodeError):
+            return
+        if data.get("small") != self.small_name or data.get("large") != self.large_name:
+            return      # a different pairing; its traffic says nothing about this one
+        hist = data.get("entropy_history")
+        if isinstance(hist, list):
+            self._entropy_history = [float(x) for x in hist][-MAX_HISTORY:]
+
+    def save_state(self) -> Path | None:
+        """Write the gate's observations so a later process starts warm."""
+        if self._state_path is None:
+            return None
+        self._state_path.parent.mkdir(parents=True, exist_ok=True)
+        self._state_path.write_text(json.dumps({
+            "small": self.small_name,
+            "large": self.large_name,
+            "mode": self.mode,
+            "signal": self.signal,
+            "entropy_history": self._entropy_history[-MAX_HISTORY:],
+        }))
+        self._since_save = 0
+        return self._state_path
 
     def _threshold(self) -> float | None:
         if self._fixed_threshold is not None:
@@ -227,6 +283,14 @@ class GreenGate:
         if decision == "ESCALATE":
             s.large_carbon_g += large_carbon
             s.large_calls += 1
+
+        if self._state_path is not None:
+            self._since_save += 1
+            if self._since_save >= SAVE_EVERY:
+                try:
+                    self.save_state()
+                except OSError:
+                    pass        # a failed write must never fail a request
 
         return RouteResult(
             response=response, decision=decision, signal=sig, threshold=thr,

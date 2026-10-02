@@ -61,6 +61,24 @@ and `profile()` both say so in plain words.
 `audit()` reports cost, not quality: the library has no judge, so what
 escalation buys you has to come from your own evaluation.
 
+### Surviving a restart
+
+The automatic gate places its threshold as a percentile of the traffic it has seen, so it needs
+roughly twenty queries before it will escalate anything at all. A process that restarts often,
+a batch job or a serverless function, would otherwise never leave that warm-up and never escalate:
+
+```python
+gw = greengate.GreenGate(small=..., large=..., persist=True)
+
+# or point it somewhere yourself:
+gw = greengate.GreenGate(small=..., large=..., state_path="./gate.json")
+```
+
+The observations are written every 20 queries and on `gw.save_state()`, capped at 10,000 so the
+file stays small and a long-lived deployment forgets traffic it no longer receives. State recorded
+for a different model pairing is ignored, and an unreadable file costs a warm-up rather than
+raising.
+
 ### Regional carbon intensity
 
 Grid intensity varies by more than twenty times between regions, so the default

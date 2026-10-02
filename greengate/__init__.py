@@ -2,7 +2,7 @@ from greengate.core import GreenGate, RouteResult
 from greengate.measure import (ContendedMeasurement, Measurement,
                                ServiceLedger, measure, should_cascade)
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __all__ = [
     "GreenGate", "RouteResult",
     "measure", "Measurement", "ServiceLedger", "should_cascade",
