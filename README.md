@@ -203,6 +203,27 @@ pip install greengate[api]    # openai + ecologits for API large tiers
 pip install greengate[eval]   # pandas/matplotlib for the evaluation scripts
 ```
 
+## Seeing it work
+
+`demo_kaggle.ipynb` is a runnable notebook that exercises the whole public interface on a free
+cloud GPU, with the measurement taken from the board's own power sensor rather than estimated.
+Open it on [Kaggle](https://www.kaggle.com/code) with a T4 accelerator, run the setup section
+once, and the rest executes in seconds:
+
+| Section | Shows |
+|---|---|
+| 1 | `measure()` instrumenting inference the library does not itself run |
+| 2 | A measurement refusing to report when the accelerator was shared |
+| 3 | `should_cascade()` applying the break-even condition to four traffic profiles |
+| 4 | `audit()` deciding whether to cascade, on a sample, before anything is deployed |
+| 5 | `route()` charging an escalated query for both runs and naming the discarded one |
+| 6 | `profile()` returning the session verdict, or what it still needs to know |
+| 7 | A carbon ceiling degrading quality gracefully instead of overrunning |
+| 8 | `ServiceLedger` for batched services, and regional grid intensity |
+
+For a terminal instead of a notebook, `demo_viva.py` replays the published evidence offline in
+about two seconds, and `demo_live.py` is an interactive router.
+
 ## Reproducing the evaluation
 
 The `RUNBOOK.md` in this repository reproduces every published number from scratch: calibration, three deployment configurations, four baselines, threshold sweeps, grid conditions, trace replay against real Azure arrival traces, and three ablation studies.
