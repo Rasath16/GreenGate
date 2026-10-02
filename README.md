@@ -61,6 +61,36 @@ and `profile()` both say so in plain words.
 `audit()` reports cost, not quality: the library has no judge, so what
 escalation buys you has to come from your own evaluation.
 
+### Choosing the operating point
+
+The escalation rate is the term the break-even condition is written in, so it is usually the thing
+you have actually decided. Say it directly:
+
+```python
+gw = greengate.GreenGate(small=..., large=..., escalation_rate=0.25)
+gw.config(escalation_rate=0.10)        # change it at any time
+```
+
+The named modes are fixed positions on the same dial, and `threshold` pins the signal value itself
+and overrides both:
+
+| setting | escalates |
+|---|---|
+| `mode="green"` | the most uncertain 20% |
+| `mode="balanced"` (default) | 40% |
+| `mode="quality"` | 65% |
+| `escalation_rate=r` | exactly `r` |
+| `threshold=t` | everything above `t` |
+
+The gate places the cut as a quantile of the traffic it has seen, so the rate you ask for is the
+rate you get whatever the absolute signal values look like on your workload. Asking for a rate or a
+mode clears any pinned threshold.
+
+Note what this controls and what it does not. It fixes the **cost** position relative to break-even,
+which is predictable in advance. It does not promise that the queries it escalates are the ones that
+needed it; that depends on how well the confidence signal separates on your workload, which the
+thesis measures and bounds.
+
 ### Surviving a restart
 
 The automatic gate places its threshold as a percentile of the traffic it has seen, so it needs

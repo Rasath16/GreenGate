@@ -38,6 +38,16 @@ SAVE_EVERY = 20
 MIN_LARGE_CALLS_FOR_VERDICT = 5
 
 
+def _check_rate(rate: float | None) -> float | None:
+    """Validate a requested escalation rate, which must be a fraction."""
+    if rate is None:
+        return None
+    rate = float(rate)
+    if not 0.0 <= rate <= 1.0:
+        raise ValueError("escalation_rate must be a fraction between 0 and 1")
+    return rate
+
+
 @dataclass
 class RouteResult:
     response: str
@@ -95,7 +105,8 @@ class GreenGate:
                  large_is_api: bool | None = None,
                  carbon_intensity: float | None = None,
                  state_path: str | Path | None = None,
-                 persist: bool = False):
+                 persist: bool = False,
+                 escalation_rate: float | None = None):
         if mode not in AUTO_THRESHOLD_PERCENTILE:
             raise ValueError(f"mode must be one of {list(AUTO_THRESHOLD_PERCENTILE)}")
         if signal not in ("entropy", "semantic"):
@@ -103,6 +114,12 @@ class GreenGate:
 
         self.small_name, self.large_name = small, large
         self.mode = mode
+        # The escalation rate is the term the break-even condition is written
+        # in, so a developer who has chosen one should be able to say it
+        # directly. The named modes are fixed points on the same dial.
+        self._rate = _check_rate(escalation_rate)
+        if self._rate is None:
+            self._rate = 1.0 - AUTO_THRESHOLD_PERCENTILE[mode] / 100.0
         self.signal = signal
         self._fixed_threshold = threshold
         self._entropy_history: list[float] = []
@@ -197,9 +214,13 @@ class GreenGate:
             return self._fixed_threshold
         if len(self._entropy_history) < WARMUP_QUERIES:
             return None  # warmup: not enough traffic seen yet
+        if self._rate <= 0.0:
+            return float("inf")     # escalate nothing
+        if self._rate >= 1.0:
+            return float("-inf")    # escalate everything
         h = sorted(self._entropy_history)
-        pct = AUTO_THRESHOLD_PERCENTILE[self.mode]
-        return h[int(pct / 100 * (len(h) - 1))]
+        # cut so that the most uncertain self._rate of observed traffic is above
+        return h[int((1.0 - self._rate) * (len(h) - 1))]
 
     def _semantic_entropy(self, query: str, k: int = 3) -> tuple[float, float]:
         """(semantic entropy, extra energy J). EXPERIMENTAL — k extra samples."""
@@ -449,13 +470,27 @@ class GreenGate:
 
     def config(self, threshold: float | None = None,
                budget_g: float | None = None,
-               mode: str | None = None):
+               mode: str | None = None,
+               escalation_rate: float | None = None):
+        """Change the operating point.
+
+        ``escalation_rate`` states the fraction of queries to escalate, which
+        is the term the break-even condition is written in and so usually the
+        thing a developer has actually decided. ``mode`` sets the same dial to
+        a named position: green 20%, balanced 40%, quality 65%. ``threshold``
+        pins the signal value itself and overrides both.
+        """
         if threshold is not None:
             self._fixed_threshold = threshold
         if mode is not None:
             if mode not in AUTO_THRESHOLD_PERCENTILE:
                 raise ValueError(f"mode must be one of {list(AUTO_THRESHOLD_PERCENTILE)}")
             self.mode = mode
+            self._rate = 1.0 - AUTO_THRESHOLD_PERCENTILE[mode] / 100.0
+            self._fixed_threshold = None     # a named mode means auto-tune again
+        if escalation_rate is not None:
+            self._rate = _check_rate(escalation_rate)
+            self._fixed_threshold = None
         if budget_g is not None:
             from greengate.budget import SlidingWindowBudget
             self._budget = SlidingWindowBudget(budget_g, 3600.0)

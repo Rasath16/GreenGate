@@ -262,6 +262,7 @@ def _gate_with_state(tmp_path, history=None):
     gw._fixed_threshold = None
     gw._entropy_history = list(history or [])
     gw.mode = "balanced"
+    gw._rate = 0.40                 # balanced, as a fraction of traffic
     gw.small_name, gw.large_name = "small/m", "large/m"
     gw.signal = "entropy"
     gw._state_path = _Path(tmp_path) / "gate.json"
@@ -317,3 +318,78 @@ def test_save_state_is_a_no_op_when_persistence_is_off(tmp_path):
     gw = _gate_with_state(tmp_path, [1.0])
     gw._state_path = None
     assert gw.save_state() is None
+
+
+# --------------------------------------------------------------------- #
+# Setting the escalation rate directly. It is the term the break-even
+# condition is written in, so it is the thing a developer has decided.
+# --------------------------------------------------------------------- #
+
+import pytest as _pytest
+
+from greengate.core import AUTO_THRESHOLD_PERCENTILE
+
+
+def _rate_gate(rate=None, mode="balanced", history=None):
+    gw = object.__new__(GreenGate)
+    gw._session = _Session()
+    gw._fixed_threshold = None
+    gw._entropy_history = list(history if history is not None
+                               else [float(i) for i in range(100)])
+    gw.mode = mode
+    gw._rate = rate if rate is not None else 1.0 - AUTO_THRESHOLD_PERCENTILE[mode] / 100.0
+    gw.small_name, gw.large_name = "small/m", "large/m"
+    gw.signal = "entropy"
+    gw._state_path = None
+    gw._since_save = 0
+    return gw
+
+
+def _escalated_fraction(gw):
+    thr = gw._threshold()
+    return sum(1 for s in gw._entropy_history if s > thr) / len(gw._entropy_history)
+
+
+def test_requested_escalation_rate_is_what_actually_escalates():
+    for rate in (0.10, 0.25, 0.40, 0.75):
+        gw = _rate_gate(rate=rate)
+        assert abs(_escalated_fraction(gw) - rate) <= 0.02
+
+
+def test_named_modes_are_positions_on_the_same_dial():
+    for mode, pct in AUTO_THRESHOLD_PERCENTILE.items():
+        gw = _rate_gate(mode=mode)
+        assert abs(_escalated_fraction(gw) - (1 - pct / 100)) <= 0.02
+
+
+def test_rate_of_zero_escalates_nothing_and_one_escalates_everything():
+    assert _escalated_fraction(_rate_gate(rate=0.0)) == 0.0
+    assert _escalated_fraction(_rate_gate(rate=1.0)) == 1.0
+
+
+def test_config_accepts_a_rate_and_clears_a_pinned_threshold():
+    gw = _rate_gate(rate=0.40)
+    gw.config(threshold=12.0)
+    assert gw._threshold() == 12.0            # pinned value wins
+    gw.config(escalation_rate=0.20)
+    assert gw._fixed_threshold is None        # asking for a rate un-pins it
+    assert abs(_escalated_fraction(gw) - 0.20) <= 0.02
+
+
+def test_config_mode_also_un_pins_and_moves_the_dial():
+    gw = _rate_gate(rate=0.40)
+    gw.config(threshold=12.0)
+    gw.config(mode="green")
+    assert gw._fixed_threshold is None
+    assert abs(_escalated_fraction(gw) - 0.20) <= 0.02
+
+
+def test_a_rate_outside_zero_to_one_is_refused():
+    for bad in (-0.1, 1.5):
+        with _pytest.raises(ValueError):
+            _rate_gate().config(escalation_rate=bad)
+
+
+def test_the_rate_still_waits_for_warmup():
+    gw = _rate_gate(rate=0.3, history=[1.0, 2.0, 3.0])
+    assert gw._threshold() is None
