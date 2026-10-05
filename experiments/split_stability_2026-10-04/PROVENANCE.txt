@@ -1,0 +1,20 @@
+Split-stability analysis (thesis Section 5.10.6)
+================================================
+
+Produced by:   python eval_split_stability.py > report.txt
+Repository at: 33bb8986bb122edf98882c56282952a963d25aca
+Date:          2026-10-04
+
+Inputs (regenerated into results/ by bootstrap_results.py):
+  results/main15_records.jsonl     500 per-query records
+  results/judgments_main15.jsonl   judge scores for both tiers
+
+What it does:
+  The held-out result in Section 5.5.4 and the comparison in Ablation D
+  (5.10.5) each rest on ONE random division of the workload into a
+  validation half and a test half. This repeats that entire protocol
+  over 200 independent draws, and separately refits the learned router
+  under 10 cross-validation seeds, to show the published conclusions
+  are properties of the data rather than of the split that was drawn.
+
+Analysis only - no model inference is run, so it reproduces exactly.

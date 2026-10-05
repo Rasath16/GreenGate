@@ -1,0 +1,61 @@
+judged records: 500
+
+==============================================================================
+  1. VARYING THE VALIDATION/TEST SPLIT  (200 independent draws)
+==============================================================================
+  Threshold chosen on the validation half at a 30% escalation
+  budget, applied unchanged to the test half. Model seed fixed.
+
+  policy                              retention % (2.5, med, 97.5)        carbon reduction %
+  static small tier                    94.1  [ 91.2,  97.0]          52.8  [ 51.5,  54.4]
+  entropy (raw)                        96.8  [ 94.4,  99.5]          22.7  [ 13.0,  30.9]
+  entropy (calibrated)                 97.5  [ 95.1, 100.0]          23.3  [ 14.7,  31.1]
+  learned: prompt-only                 97.3  [ 95.1,  99.5]          37.5  [ 31.8,  41.8]
+  learned: prompt text, tf-idf         97.1  [ 94.5,  99.5]          36.9  [ 32.9,  41.7]
+  learned: post-hoc                    98.4  [ 96.1, 100.8]          23.7  [ 15.1,  30.5]
+
+==============================================================================
+  2. HOW OFTEN DOES EACH PUBLISHED CONCLUSION HOLD?
+==============================================================================
+
+  (a)  Retention: post-hoc learned router minus entropy gate
+       across splits   median +1.69   [-0.91, +3.87]
+       thesis reports  +1.10  [-1.30, +3.50]  from the single drawn split
+       The two ranges agree closely, so the published split was
+       representative. The interval still contains zero, so the
+       conclusion of no reliable retention advantage stands.
+
+  (b)  Carbon: the thesis claim about WHERE the router's advantage comes from
+       prompt-only router (skips the discarded small run) minus entropy
+         median +14.59  [+5.46, +24.25]   positive in 100.0% of splits
+       post-hoc router (pays for the small run) minus entropy
+         median +0.86  [-10.80, +10.93]   positive in 54.5% of splits
+       This is the central claim of Ablation D and it holds in every
+       split: the carbon advantage belongs to deciding early, not to
+       routing better. Charge the router for the discarded run and it
+       disappears.
+
+  (c)  Entropy gate against the static small tier
+       retention        median +2.61  [+1.19, +4.53]
+       carbon reduction median -30.04  [-38.61, -22.75]
+       The gate buys a little quality at a large carbon cost in every
+       split. Neither option dominates, which is the trade-off the
+       thesis reports rather than a win for routing.
+
+==============================================================================
+  3. VARYING THE CROSS-VALIDATION DRAW  (10 model seeds)
+==============================================================================
+  The learned router is refitted from scratch under each seed.
+
+  signal                                AUROC across seeds (min, med, max)
+  learned: prompt-only                     0.487        0.541        0.561
+  learned: prompt text, tf-idf             0.574        0.596        0.633
+  learned: post-hoc                        0.602        0.630        0.644
+  entropy (raw), deterministic             0.533        0.533        0.533
+
+==============================================================================
+  VERDICT
+==============================================================================
+  If the retention conclusion holds in the large majority of splits and the
+  carbon ordering is stable, the published held-out result is a property of
+  the data rather than of the single split that was drawn.
